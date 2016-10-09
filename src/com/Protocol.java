@@ -5,19 +5,18 @@
  */
 package com;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-
+import java.io.*;
 
 /**
  *
  * @author artureca
  */
-public class Proto_AZGO extends Protocol {
+public class Protocol extends Thread{
+    private final PrintWriter out;
+    private final BufferedReader in;
 
-    public Proto_AZGO(PrintWriter out, BufferedReader in) {
-        super(out, in);
+    public Protocol(PrintWriter out, BufferedReader in) {
+        this.out = out;
+        this.in = in;
     }
-
-
 }

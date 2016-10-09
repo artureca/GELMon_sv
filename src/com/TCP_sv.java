@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author artureca
  */
-public class TCP_sv {
-    private static final ConcurrentHashMap<Socket, Proto_AZGO> connected= new ConcurrentHashMap<>();    
+public class TCP_sv <T extends Protocol> {
+    private static final ConcurrentHashMap<Socket, Protocol> connected= new ConcurrentHashMap<>();    
     private static final Integer PORT = 1531;
     private static Boolean listening ;
     private static ServerSocket serverSocket;
@@ -68,7 +68,7 @@ public class TCP_sv {
     private static void addClients(){
         while(listening){
             Socket sock;
-            Proto_AZGO proto;
+            Protocol proto;
             PrintWriter out;
             BufferedReader in;
             
@@ -84,7 +84,7 @@ public class TCP_sv {
                 continue;
             }
 
-            proto = new Proto_AZGO(out, in);
+            proto = new Protocol(out, in);
             proto.start();
 
             connected.put(sock, proto);
@@ -97,7 +97,7 @@ public class TCP_sv {
         while(listening || !connected.isEmpty()){
             
             connected.keySet().stream().forEach((sock) -> {
-                Proto_AZGO proto = connected.get(sock);
+                Protocol proto = connected.get(sock);
                 if (!proto.isAlive()) {
                     System.out.println("- Client: "+sock.toString()+" | "+proto.toString());
                     try {
