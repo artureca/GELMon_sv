@@ -8,6 +8,8 @@ package com;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("CallToPrintStackTrace")
 
@@ -16,13 +18,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author artureca
  */
 public class TCP_sv <T extends Protocol> {
-    private static final ConcurrentHashMap<Socket, Protocol> connected= new ConcurrentHashMap<>();    
-    private static final Integer PORT = 1531;
-    private static Boolean listening ;
-    private static ServerSocket serverSocket;
-    
+    private final ConcurrentHashMap<Socket, T> connected= new ConcurrentHashMap<>();    
+    private final Integer PORT = 1531;
+    private Boolean listening ;
+    private ServerSocket serverSocket;
+    Class<T> clazz;
+
+    public TCP_sv(Class<T> clazz) {
+        this.clazz = clazz;
+    }
+
+    private T newClient(PrintWriter out, BufferedReader in) throws InstantiationException, IllegalAccessException {
+        return clazz.newInstance();
+    }
         
-    public static void start() {
+    public void start() {
        
         listening = true;
         
@@ -52,7 +62,7 @@ public class TCP_sv <T extends Protocol> {
         }.start();
     }
  
-    public static void stop() {
+    public void stop() {
 
         try {
             serverSocket.close();
@@ -65,10 +75,10 @@ public class TCP_sv <T extends Protocol> {
         System.err.println("Scrabble - SERVER FINISH");
     }
 
-    private static void addClients(){
+    private void addClients(){
         while(listening){
             Socket sock;
-            Protocol proto;
+            T proto = null;
             PrintWriter out;
             BufferedReader in;
             
@@ -84,20 +94,24 @@ public class TCP_sv <T extends Protocol> {
                 continue;
             }
 
-            proto = new Protocol(out, in);
-            proto.start();
-
+            try {
+                proto = newClient(out, in);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(TCP_sv.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (proto != null){
+                proto.start();
             connected.put(sock, proto);
-            
             System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
+            }
         }
     }
     
-    private static void killClients(){
+    private void killClients(){
         while(listening || !connected.isEmpty()){
             
             connected.keySet().stream().forEach((sock) -> {
-                Protocol proto = connected.get(sock);
+                T proto = connected.get(sock);
                 if (!proto.isAlive()) {
                     System.out.println("- Client: "+sock.toString()+" | "+proto.toString());
                     try {
