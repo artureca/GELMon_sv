@@ -19,12 +19,13 @@ import java.util.logging.Logger;
  */
 public class TCP_sv <T extends Protocol> {
     private final ConcurrentHashMap<Socket, T> connected= new ConcurrentHashMap<>();    
-    private final Integer PORT = 1531;
+    private final Integer port;
     private Boolean listening ;
     private ServerSocket serverSocket;
     Class<T> clazz;
 
-    public TCP_sv(Class<T> clazz) {
+    public TCP_sv(Class<T> clazz, Integer port) {
+        this.port = port;
         this.clazz = clazz;
     }
 
@@ -38,10 +39,10 @@ public class TCP_sv <T extends Protocol> {
         
         try {
             
-            serverSocket = new ServerSocket(PORT);
+            serverSocket = new ServerSocket(this.port);
             
         } catch (IOException ex) {
-            System.err.println("Could not listen on port: "+PORT.toString()+"!");
+            System.err.println("Could not listen on port: "+this.port.toString()+"!");
             ex.printStackTrace();
             System.out.println("Server shuting down!");
             return;
@@ -101,8 +102,8 @@ public class TCP_sv <T extends Protocol> {
             }
             if (proto != null){
                 proto.start();
-            connected.put(sock, proto);
-            System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
+                connected.put(sock, proto);
+                System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
             }
         }
     }
