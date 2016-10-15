@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author artureca
  */
-public class TCP_sv <T extends Protocol> {
+public class TCP_sv <T extends Protocol> implements Daemon{
     private final ConcurrentHashMap<Socket, T> connected= new ConcurrentHashMap<>();    
     private final Integer port;
     private Boolean listening ;
@@ -33,6 +33,7 @@ public class TCP_sv <T extends Protocol> {
         return clazz.newInstance();
     }
         
+    @Override
     public void start() {
        
         listening = true;
@@ -63,6 +64,7 @@ public class TCP_sv <T extends Protocol> {
         }.start();
     }
  
+    @Override
     public void stop() {
 
         try {
@@ -79,12 +81,11 @@ public class TCP_sv <T extends Protocol> {
     private void addClients(){
         while(listening){
             Socket sock;
-            T proto = null;
+            T proto;
             PrintWriter out;
             BufferedReader in;
             
             try {
-                
                 sock = serverSocket.accept();
                 out = new PrintWriter(sock.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -97,13 +98,12 @@ public class TCP_sv <T extends Protocol> {
 
             try {
                 proto = newClient(out, in);
-            } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(TCP_sv.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (proto != null){
                 proto.start();
                 connected.put(sock, proto);
                 System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
+
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(TCP_sv.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

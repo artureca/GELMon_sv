@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package business;
+package communication;
 
 /**
  *
  * @author artureca
  */
-public class filler {
-    
+public interface Daemon {
+    public void start();
+    public void stop();
 }

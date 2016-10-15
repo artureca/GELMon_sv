@@ -11,7 +11,7 @@ import java.io.*;
  *
  * @author artureca
  */
-public class Protocol extends Thread{
+abstract public class Protocol extends Thread{
     final PrintWriter out;
     final BufferedReader in;
 
@@ -39,9 +39,5 @@ public class Protocol extends Thread{
         }
     }
     
-    String decode(String received){
-        if (received.equals("Terminate"))
-            return null;
-        return received.concat(" OK");
-    }
+    abstract String decode(String received);
 }

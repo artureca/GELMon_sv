@@ -9,7 +9,7 @@ package communication;
  *
  * @author artureca
  */
-public class main {
+public class Main {
 
     /**
      * @param args the command line arguments
@@ -25,6 +25,7 @@ public class main {
         TCP_sv<Proto_PHP> tcp_php_sv = new TCP_sv<>(Proto_PHP.class,21112);
         tcp_php_sv.start();
         
+        System.out.println("Running!");
         while(true);
     }
     
