@@ -12,11 +12,36 @@ import java.io.*;
  * @author artureca
  */
 public class Protocol extends Thread{
-    private final PrintWriter out;
-    private final BufferedReader in;
+    final PrintWriter out;
+    final BufferedReader in;
 
     public Protocol(PrintWriter out, BufferedReader in) {
         this.out = out;
         this.in = in;
+    }
+    
+    @Override
+    public void run() {
+        try {
+            String inputLine, outputLine;
+            while ((inputLine = this.in.readLine()) != null) {
+                outputLine = this.decode(inputLine);
+                if (outputLine == null) break;
+                synchronized(this.out){
+                    this.out.println(outputLine);
+                }
+            }
+            this.out.close();
+            this.in.close();
+
+        } catch (IOException e) {
+            //IGNORE EXCEPTION ???
+        }
+    }
+    
+    String decode(String received){
+        if (received.equals("Terminate"))
+            return null;
+        return received.concat(" OK");
     }
 }

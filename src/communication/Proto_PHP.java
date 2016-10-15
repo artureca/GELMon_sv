@@ -13,9 +13,9 @@ import java.io.PrintWriter;
  *
  * @author artureca
  */
-public class Proto_AZGO extends Protocol {
+public class Proto_PHP extends Protocol {
 
-    public Proto_AZGO(PrintWriter out, BufferedReader in) {
+    public Proto_PHP(PrintWriter out, BufferedReader in) {
         super(out, in);
     }
 
@@ -28,6 +28,4 @@ public class Proto_AZGO extends Protocol {
             default: return null;
         }
     }
-    
-
 }

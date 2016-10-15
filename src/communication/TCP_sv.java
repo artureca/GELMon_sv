@@ -24,7 +24,7 @@ public class TCP_sv <T extends Protocol> {
     private ServerSocket serverSocket;
     Class<T> clazz;
 
-    public TCP_sv(Class<T> clazz, Integer port) {
+    TCP_sv(Class<T> clazz, Integer port) {
         this.port = port;
         this.clazz = clazz;
     }
