@@ -24,6 +24,8 @@ public class main {
         // Start PHP tcp interface server
         TCP_sv<Proto_PHP> tcp_php_sv = new TCP_sv<>(Proto_PHP.class,21112);
         tcp_php_sv.start();
+        
+        while(true);
     }
     
 }
