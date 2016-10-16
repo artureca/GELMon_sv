@@ -21,7 +21,6 @@ public class Proto_AZGO extends Protocol {
 
     @Override
     String decode(String received){
-        System.out.println(received);
         String[] tokens = received.split("@");
         switch (tokens[0]){
             //case "Login": return handlerLogin(tokens);

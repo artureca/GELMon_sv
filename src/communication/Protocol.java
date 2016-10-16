@@ -40,7 +40,7 @@ abstract public class Protocol extends Thread{
             this.in.close();
 
         } catch (IOException e) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
