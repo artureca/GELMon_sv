@@ -22,11 +22,19 @@ public class TCP_sv <T extends Protocol> implements Daemon{
     private final Integer port;
     private Boolean listening ;
     private ServerSocket serverSocket;
-    Class<T> clazz;
+    private final Class<T> clazz;
+    private final String label;
 
     TCP_sv(Class<T> clazz, Integer port) {
         this.port = port;
         this.clazz = clazz;
+        this.label = null;
+    }
+    
+    TCP_sv(Class<T> clazz, Integer port, String label) {
+        this.port = port;
+        this.clazz = clazz;
+        this.label = label;
     }
 
     private T newClient(PrintWriter out, BufferedReader in) throws InstantiationException, IllegalAccessException {
@@ -34,20 +42,11 @@ public class TCP_sv <T extends Protocol> implements Daemon{
     }
         
     @Override
-    public void start() {
+    public void start() throws IOException{
        
         listening = true;
         
-        try {
-            
-            serverSocket = new ServerSocket(this.port);
-            
-        } catch (IOException ex) {
-            System.err.println("Could not listen on port: "+this.port.toString()+"!");
-            ex.printStackTrace();
-            System.out.println("Server shuting down!");
-            return;
-        }
+        serverSocket = new ServerSocket(this.port);
 
         new Thread(){
             @Override
@@ -62,20 +61,27 @@ public class TCP_sv <T extends Protocol> implements Daemon{
                 killClients();
             }
         }.start();
+        
+        if (label != null)
+            System.out.println("Started: " + this.label);
     }
  
     @Override
+    @SuppressWarnings("empty-statement")
     public void stop() {
-
+        
+        listening = false;
+        
+        while(!connected.isEmpty());
+        
         try {
             serverSocket.close();
         } catch (IOException ex) {
-            System.err.println("Could not close port!");
             ex.printStackTrace();
-            System.err.println("Server shuting down!");
         }
         
-        System.err.println("Scrabble - SERVER FINISH");
+        if (label != null)
+            System.out.println("Stopped: " + this.label);
     }
 
     private void addClients(){

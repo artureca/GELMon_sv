@@ -5,11 +5,13 @@
  */
 package communication;
 
+import java.io.IOException;
+
 /**
  *
  * @author artureca
  */
 public interface Daemon {
-    public void start();
+    public void start() throws IOException;
     public void stop();
 }
