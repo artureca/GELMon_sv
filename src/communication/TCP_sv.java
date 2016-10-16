@@ -6,6 +6,7 @@
 package communication;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -37,8 +38,11 @@ public class TCP_sv <T extends Protocol> implements Daemon{
         this.label = label;
     }
 
-    private T newClient(PrintWriter out, BufferedReader in) throws InstantiationException, IllegalAccessException {
-        return clazz.newInstance();
+    private T newClient(PrintWriter out, BufferedReader in) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+        Class[] cArg = new Class[2];
+        cArg[0] = PrintWriter.class;
+        cArg[1] = BufferedReader.class;
+        return clazz.getConstructor(cArg).newInstance(out,in);
     }
         
     @Override
@@ -108,7 +112,7 @@ public class TCP_sv <T extends Protocol> implements Daemon{
                 connected.put(sock, proto);
                 System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
 
-            } catch (InstantiationException | IllegalAccessException ex) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(TCP_sv.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

@@ -38,7 +38,8 @@ public class Main {
         }
         
         System.out.println("Running!");
-
+        while(true);
+        /*
         synchronized(HOLDER) {
             while (true) {
                 try {
@@ -48,7 +49,7 @@ public class Main {
                 }
             }
         }
-
+        */
     }
     
 }
