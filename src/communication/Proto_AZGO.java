@@ -26,7 +26,7 @@ public class Proto_AZGO extends Protocol {
         switch (tokens[0]){
             //case "Login": return handlerLogin(tokens);
             //case "Logout": return handlerLogout(tokens);
-            default: return null;
+            default: return received.concat("_OK");
         }
     }
     

@@ -18,7 +18,7 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args){
         // TODO code application logic here
         
         // Start AZGO tcp interface server
@@ -36,20 +36,18 @@ public class Main {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        System.out.println("Running!");
-        while(true);
-        /*
+
         synchronized(HOLDER) {
             while (true) {
                 try {
-                    HOLDER.wait();
+                    HOLDER.wait(5000);
+                    //System.out.println("Running!");
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
-        */
+        
     }
     
 }

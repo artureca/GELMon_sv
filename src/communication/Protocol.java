@@ -6,6 +6,9 @@
 package communication;
 
 import java.io.*;
+import java.sql.Timestamp;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,17 +28,19 @@ abstract public class Protocol extends Thread{
         try {
             String inputLine, outputLine;
             while ((inputLine = this.in.readLine()) != null) {
+                System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Received: " + inputLine + " | From: " + this.toString());
                 outputLine = this.decode(inputLine);
                 if (outputLine == null) break;
                 synchronized(this.out){
                     this.out.println(outputLine);
                 }
+                System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + outputLine + " | To: " + this.toString());
             }
             this.out.close();
             this.in.close();
 
         } catch (IOException e) {
-            //IGNORE EXCEPTION ???
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     

@@ -8,6 +8,7 @@ package communication;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
+import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +68,7 @@ public class TCP_sv <T extends Protocol> implements Daemon{
         }.start();
         
         if (label != null)
-            System.out.println("Started: " + this.label);
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Started: " + this.label);
     }
  
     @Override
@@ -85,7 +86,7 @@ public class TCP_sv <T extends Protocol> implements Daemon{
         }
         
         if (label != null)
-            System.out.println("Stopped: " + this.label);
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Stopped: " + this.label);
     }
 
     private void addClients(){
@@ -110,7 +111,7 @@ public class TCP_sv <T extends Protocol> implements Daemon{
                 proto = newClient(out, in);
                 proto.start();
                 connected.put(sock, proto);
-                System.out.println("+ Client: "+sock.toString()+" | "+proto.toString());
+                System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | + Client: "+sock.toString()+" | "+proto.toString());
 
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(TCP_sv.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,7 +125,7 @@ public class TCP_sv <T extends Protocol> implements Daemon{
             connected.keySet().stream().forEach((sock) -> {
                 T proto = connected.get(sock);
                 if (!proto.isAlive()) {
-                    System.out.println("- Client: "+sock.toString()+" | "+proto.toString());
+                    System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | - Client: "+sock.toString()+" | "+proto.toString());
                     try {
                         sock.close();
                     } catch (IOException ex) {
