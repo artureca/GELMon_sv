@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package communication;
+package analysis.com;
 
+import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
@@ -20,7 +21,7 @@ public class Proto_PHP extends Protocol {
     }
 
     @Override
-    String decode(String received){
+    public String decode(String received){
         String[] tokens = received.split("@");
         switch (tokens[0]){
             //case "Login": return handlerLogin(tokens);

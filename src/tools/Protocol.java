@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package communication;
+package tools;
 
 import java.io.*;
 import java.sql.Timestamp;
@@ -44,5 +44,5 @@ abstract public class Protocol extends Thread{
         }
     }
     
-    abstract String decode(String received);
+    abstract public String decode(String received);
 }

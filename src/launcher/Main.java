@@ -5,7 +5,9 @@
  */
 package launcher;
 
-import communication.*;
+import analysis.com.Proto_AZGO;
+import analysis.com.Proto_PHP;
+import tools.TCP_sv;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
