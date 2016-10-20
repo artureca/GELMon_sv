@@ -5,6 +5,7 @@
  */
 package communication;
 
+import tools.Daemon;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
@@ -27,13 +28,13 @@ public class TCP_sv <T extends Protocol> implements Daemon{
     private final Class<T> clazz;
     private final String label;
 
-    TCP_sv(Class<T> clazz, Integer port) {
+    public TCP_sv(Class<T> clazz, Integer port) {
         this.port = port;
         this.clazz = clazz;
         this.label = null;
     }
     
-    TCP_sv(Class<T> clazz, Integer port, String label) {
+    public TCP_sv(Class<T> clazz, Integer port, String label) {
         this.port = port;
         this.clazz = clazz;
         this.label = label;
