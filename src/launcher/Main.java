@@ -7,10 +7,11 @@ package launcher;
 
 import analysis.com.Proto_AZGO;
 import analysis.com.Proto_PHP;
-import tools.TCP_sv;
+import tools.*;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sdr.com.Proto_PI;
 
 /**
  *
@@ -39,7 +40,16 @@ public class Main {
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
+        
+        // Start SDR udp server
+        UDP_sv<Proto_PI> udp_pi_sv = new UDP_sv<>(Proto_PI.class,21113,"Raspberry PI UDP Server");
+        try {
+            udp_pi_sv.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         synchronized(HOLDER) {
             while (true) {
                 try {

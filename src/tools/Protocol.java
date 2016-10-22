@@ -7,8 +7,6 @@ package tools;
 
 import java.io.*;
 import java.sql.Timestamp;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -42,6 +40,13 @@ abstract public class Protocol extends Thread{
         } catch (IOException e) {
             //Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+    
+    public String logDecode(String received){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Received: " + received + " | From: " + this.toString());
+        String sent = this.decode(received);
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + sent + " | To: " + this.toString());
+        return sent;
     }
     
     abstract public String decode(String received);
