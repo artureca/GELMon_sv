@@ -24,10 +24,15 @@ public class Proto_AZGO extends Protocol {
     public String decode(String received){
         String[] tokens = received.split("@");
         switch (tokens[0]){
-            //case "Login": return handlerLogin(tokens);
+            case "Login": return handlerLogin(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return received.concat("_OK");
         }
+    }
+    
+    public String handlerLogin(String[] tokens){
+        
+        return "ok";
     }
     
 
