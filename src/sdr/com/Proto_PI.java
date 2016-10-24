@@ -21,7 +21,12 @@ public class Proto_PI extends Protocol {
 
     @Override
     public String decode(String received) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            String[] tokens = received.split("@");
+        switch (tokens[0]){
+            //case "Login": return handlerLogin(tokens);
+            //case "Logout": return handlerLogout(tokens);
+            default: return received.concat("_OK");
+        }
     }
     
 }
