@@ -7,6 +7,7 @@ package tools;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.codec.binary.Hex;
 import java.net.*;
 import java.sql.Timestamp;
 import java.util.logging.Level;
@@ -30,14 +31,14 @@ public class UDP_sv <T extends Protocol> implements Daemon{
         this.port = port;
         this.clazz = clazz;
         this.label = null;
-        this.bufferSize = 1024;
+        this.bufferSize = 10240;
     }
     
     public UDP_sv(Class<T> clazz, Integer port, String label) {
         this.port = port;
         this.clazz = clazz;
         this.label = label;
-        this.bufferSize = 1024;
+        this.bufferSize = 10240;
     }
 
     private T newClient(PrintWriter out, BufferedReader in) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
@@ -82,6 +83,7 @@ public class UDP_sv <T extends Protocol> implements Daemon{
             byte[] rawData;
             rawData = new byte[this.bufferSize];
             data = new DatagramPacket(rawData,this.bufferSize);
+            System.out.println(Hex.encodeHexString(rawData));
             try {
                 this.serverSocket.receive(data);
             } catch (IOException ex) {
@@ -102,6 +104,8 @@ public class UDP_sv <T extends Protocol> implements Daemon{
         try {
             T proto = newClient(null, null);
             String response = proto.logDecode(new String(data.getData()));
+            if (response == null)
+                return;
             this.serverSocket.send(new DatagramPacket(response.getBytes(),response.length(),data.getAddress(),data.getPort()));
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException ex) {
             Logger.getLogger(UDP_sv.class.getName()).log(Level.SEVERE, null, ex);
