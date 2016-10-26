@@ -8,6 +8,7 @@ package analysis.com;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import analysis.bl.Logic.*;
 
 
 /**
@@ -37,17 +38,14 @@ public class Proto_PHP extends Protocol {
         
         String fetch1 = "";
         String fetch2 = "";
-        
-        String itmapLocale = "";
-
-        
-        fetch1.concat(dat1);
-        fetch2.concat(dat2);
+                
+        fetch1 = fetch1.concat(dat1);
+        fetch2 = fetch2.concat(dat2);
         
         //Pass to Logic fetch1, fetch2, get the itmap location
         
         //itmapLocale = getItmap(fetch1, fetch2);
         
-        return "ok";
+        return analysis.bl.Logic.getItmap(fetch1, fetch2);
     }
 }

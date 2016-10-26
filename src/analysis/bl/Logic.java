@@ -11,4 +11,12 @@ package analysis.bl;
  */
 public class Logic {
     
+    public static String getItmap(String date1, String date2){
+        String ret = new String("");
+        
+        
+        
+        return ret;
+    }
+    
 }
