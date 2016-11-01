@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
  */
 public class UDP_sv <T extends Protocol> implements Daemon{
     private final Integer port;

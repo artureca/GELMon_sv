@@ -19,7 +19,7 @@ package analysis.db;
 
 /**
  *
- * @author artureca
+ * @author ???
  */
 public class MySQL {
     

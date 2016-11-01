@@ -17,22 +17,25 @@
 
 package launcher;
 
-import analysis.com.Proto_AZGO;
-import analysis.com.Proto_PHP;
+import analysis.com.*;
+import sdr.com.*;
 import tools.*;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sdr.com.Proto_PI;
 
 /**
- *
- * @author artureca
+ * Holds the main function. Which serves as a daemon launcher.
+ *  
+ * @author Artur Antunes
  */
 public class Main {
     private static final Boolean HOLDER = false;
+    
     /**
+     * A simple daemon launcher.
      * @param args the command line arguments
+     * @author Artur Antunes
      */
     public static void main(String[] args){
         // TODO code application logic here

@@ -19,8 +19,12 @@ package analysis.dsp;
 
 /**
  *
- * @author Raquel
+ * @author Artur Antunes
+ * @author Eugenio Carvalhido
+ * @author Raquel Ribeiro
+ * @author Vânia Vieira
  */
+
 public class Pixel {
     private Integer R;
     private Integer G;

@@ -21,7 +21,10 @@ import java.awt.image.BufferedImage;
 
 /**
  *
- * @author Raquel
+ * @author Artur Antunes
+ * @author Eugenio Carvalhido
+ * @author Raquel Ribeiro
+ * @author Vânia Vieira
  */
 public class Image {
     private final Pixel[][] pixelMap;

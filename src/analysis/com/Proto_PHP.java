@@ -20,12 +20,12 @@ package analysis.com;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-import analysis.bl.Logic.*;
 
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
+ * @author Rubens Figueiredo
  */
 public class Proto_PHP extends Protocol {
 

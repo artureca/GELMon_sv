@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
  */
 abstract public class Protocol extends Thread{
     final PrintWriter out;

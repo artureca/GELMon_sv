@@ -19,7 +19,7 @@ package analysis.bl;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
  */
 public class Logic {
     

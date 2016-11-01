@@ -24,7 +24,8 @@ import java.io.PrintWriter;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
+ * @author Rubens Figueiredo
  */
 public class Proto_AZGO extends Protocol {
 

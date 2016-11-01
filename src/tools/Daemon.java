@@ -20,10 +20,21 @@ package tools;
 import java.io.IOException;
 
 /**
- *
- * @author artureca
+ * The Daemon interface to be used by the main launcher.
+ * @author Artur Antunes
  */
 public interface Daemon {
+
+    /**
+     * Starts the daemon.
+     * @throws IOException
+     * @author Artur Antunes
+     */
     public void start() throws IOException;
+
+    /**
+     * Stops the daemon.
+     * @author Artur Antunes
+     */
     public void stop();
 }

@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
  */
 public class TCP_sv <T extends Protocol> implements Daemon{
     private final ConcurrentHashMap<Socket, T> connected= new ConcurrentHashMap<>();    
