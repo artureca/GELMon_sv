@@ -21,8 +21,6 @@ import java.awt.image.BufferedImage;
 
 /**
  *
- * @author Artur Antunes
- * @author Eugenio Carvalhido
  * @author Raquel Ribeiro
  * @author Vânia Vieira
  */
@@ -34,6 +32,15 @@ public class Image {
     
     //public Image(BufferedImage im) {
     //}
+
+    /**
+     * 
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
+     * @param pop
+     * @param width
+     * @param height
+     */
    
     
     public Image(Double[][] pop, Integer width, Integer height) {
@@ -47,6 +54,12 @@ public class Image {
       this.height=height;
     }
     
+    /**
+     *
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
+     * @return
+     */
     public BufferedImage toBufferedImage() {
         Integer w;
         Integer h;

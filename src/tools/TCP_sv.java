@@ -30,9 +30,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * This class implements a deamon TCP server. This server implements the Daemon
+ * interface present in the tools package, it's made to work with any class that
+ * extends the class Protocol also present in the tools package.
+ * 
+ * 
  * @author Artur Antunes
- * @param <T>
+ * @param <T> Comunication protocol that extends the Protocol abtract class
  */
 @SuppressWarnings("CallToPrintStackTrace")
 public class TCP_sv <T extends Protocol> implements Daemon{
@@ -43,12 +47,27 @@ public class TCP_sv <T extends Protocol> implements Daemon{
     private final Class<T> clazz;
     private final String label;
 
+    /**
+     * A Simple constructor.
+     * 
+     * @author Artur Antunes
+     * @param clazz The extended Protocol class
+     * @param port The port for the server to listen
+     */
     public TCP_sv(Class<T> clazz, Integer port) {
         this.port = port;
         this.clazz = clazz;
         this.label = null;
     }
     
+    /**
+     * A Simple constructor with a description.\
+     * 
+     * @author Artur Antunes
+     * @param clazz The extended Protocol class
+     * @param port The port for the server to listen
+     * @param label A breif description of the server.
+     */
     public TCP_sv(Class<T> clazz, Integer port, String label) {
         this.port = port;
         this.clazz = clazz;

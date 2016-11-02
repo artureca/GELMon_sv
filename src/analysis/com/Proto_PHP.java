@@ -23,12 +23,19 @@ import java.io.PrintWriter;
 
 
 /**
- *
+ * The protocol used to comunicate with the PHP server.
+ * 
  * @author Artur Antunes
  * @author Rubens Figueiredo
  */
 public class Proto_PHP extends Protocol {
 
+    /**
+     * Simple Constructor. Just calls the superclass' constructor.
+     * 
+     * @param out the uplink channel (PrintWriter)
+     * @param in the downlink channel (BufferedReader)
+     */
     public Proto_PHP(PrintWriter out, BufferedReader in) {
         super(out, in);
     }
@@ -37,13 +44,13 @@ public class Proto_PHP extends Protocol {
     public String decode(String received){
         String[] tokens = received.split("@");
         switch (tokens[0]){
-            case "itmap": return handlerItmap(tokens);
+            case "itmap": return handlerHeatMap(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return null;
         }
     }
     
-    private String handlerItmap(String[] tokens) {
+    private String handlerHeatMap(String[] tokens) {
         
         String dat1 = tokens[1];
         String dat2 = tokens[2];

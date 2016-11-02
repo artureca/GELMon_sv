@@ -23,12 +23,19 @@ import java.io.PrintWriter;
 
 
 /**
- *
+ * The protocol used to comunicate with the AZGO mobile client.
+ * 
  * @author Artur Antunes
  * @author Rubens Figueiredo
  */
 public class Proto_AZGO extends Protocol {
 
+    /**
+     * Simple Constructor. Just calls the superclass' constructor.
+     * 
+     * @param out the uplink channel (PrintWriter)
+     * @param in the downlink channel (BufferedReader)
+     */
     public Proto_AZGO(PrintWriter out, BufferedReader in) {
         super(out, in);
     }
@@ -43,7 +50,7 @@ public class Proto_AZGO extends Protocol {
         }
     }
     
-    public String handlerLogin(String[] tokens){
+    private String handlerLogin(String[] tokens){
         
         return "ok";
     }

@@ -25,12 +25,16 @@ import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("CallToPrintStackTrace")
-
 /**
- *
+ * This class implements a deamon UDP server. This server implements the Daemon
+ * interface present in the tools package, it's made to work with any class that
+ * extends the class Protocol also present in the tools package.
+ * 
+ * 
  * @author Artur Antunes
+ * @param <T> Comunication protocol that extends the Protocol abtract class
  */
+@SuppressWarnings("CallToPrintStackTrace")
 public class UDP_sv <T extends Protocol> implements Daemon{
     private final Integer port;
     private Boolean listening ;
@@ -39,6 +43,13 @@ public class UDP_sv <T extends Protocol> implements Daemon{
     private final String label;
     private Integer bufferSize;
 
+    /**
+     * A Simple constructor.
+     * 
+     * @author Artur Antunes
+     * @param clazz The extended Protocol class
+     * @param port The port for the server to listen
+     */
     public UDP_sv(Class<T> clazz, Integer port) {
         this.port = port;
         this.clazz = clazz;
@@ -46,6 +57,14 @@ public class UDP_sv <T extends Protocol> implements Daemon{
         this.bufferSize = 10240;
     }
     
+    /**
+     * A Simple constructor with a description.\
+     * 
+     * @author Artur Antunes
+     * @param clazz The extended Protocol class
+     * @param port The port for the server to listen
+     * @param label A breif description of the server.
+     */
     public UDP_sv(Class<T> clazz, Integer port, String label) {
         this.port = port;
         this.clazz = clazz;
@@ -124,10 +143,20 @@ public class UDP_sv <T extends Protocol> implements Daemon{
         }
     }
 
+    /**
+     * Gets the vurrents's buffer size.
+     * 
+     * @return The current buffer's size
+     */
     public Integer getBufferSize() {
         return bufferSize;
     }
 
+    /**
+     * Sets the buffer's size.
+     * 
+     * @param bufferSize The new buffer's size.
+     */
     public void setBufferSize(Integer bufferSize) {
         this.bufferSize = bufferSize;
     }
