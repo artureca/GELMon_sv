@@ -17,20 +17,24 @@
 
 package tools;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("CallToPrintStackTrace")
-
 /**
  *
  * @author Artur Antunes
+ * @param <T>
  */
+@SuppressWarnings("CallToPrintStackTrace")
 public class TCP_sv <T extends Protocol> implements Daemon{
     private final ConcurrentHashMap<Socket, T> connected= new ConcurrentHashMap<>();    
     private final Integer port;
