@@ -18,16 +18,24 @@
 package analysis.bl;
 
 /**
- *
+ * A class with static methods used to process the clients requests.
+ * 
  * @author Artur Antunes
+ * @author Rubens Figueiredo
  */
 public class Logic {
     
-    public static String getItmap(String date1, String date2){
-        String ret = new String("");
-        
-        
-        
+    /**
+     * Gets the reqeusted heatmap path, creating it if it doesn't exist.
+     * 
+     * @author Rubens Figueiredo
+     * @param date1
+     * @param date2
+     * @return
+     */
+    public static String getHeatMap(long date1, long date2){
+        String ret = "";
+
         return ret;
     }
     

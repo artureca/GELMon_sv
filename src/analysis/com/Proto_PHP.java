@@ -17,6 +17,7 @@
 
 package analysis.com;
 
+import analysis.bl.*;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -44,27 +45,16 @@ public class Proto_PHP extends Protocol {
     public String decode(String received){
         String[] tokens = received.split("@");
         switch (tokens[0]){
-            case "itmap": return handlerHeatMap(tokens);
+            case "heatmap": return handlerHeatMap(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return null;
         }
     }
     
     private String handlerHeatMap(String[] tokens) {
-        
-        String dat1 = tokens[1];
-        String dat2 = tokens[2];
-        
-        String fetch1 = "";
-        String fetch2 = "";
-                
-        fetch1 = fetch1.concat(dat1);
-        fetch2 = fetch2.concat(dat2);
-        
-        //Pass to Logic fetch1, fetch2, get the itmap location
-        
-        //itmapLocale = getItmap(fetch1, fetch2);
-        
-        return analysis.bl.Logic.getItmap(fetch1, fetch2);
+        // no need to complicate stuff
+        // the logic must be passed with the correct format!!!
+        // no more Strings from this point forward, unless no other option
+        return Logic.getHeatMap(Long.getLong(tokens[1]), Long.getLong(tokens[2]));
     }
 }
