@@ -40,31 +40,51 @@ public class Main {
     public static void main(String[] args){
         // TODO code application logic here
         
-        FileSystem.loadConfig("wow.conf");
+        FileSystem.loadConfig("~/.config/gelmon_sv.conf");
+        //FileSystem.displayCurrentConfig();
+        
+        TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
+                Proto_AZGO.class,
+                Integer.decode(FileSystem.getConfig("AZGO.port")),
+                "AZGO TCP/IP Server"
+        );
+        
+        TCP_sv<Proto_PHP> tcp_php_sv = new TCP_sv<>(
+                Proto_PHP.class,
+                Integer.decode(FileSystem.getConfig("PHP.port")),
+                "PHP TCP/IP Server"
+        );
+        
+        UDP_sv<Proto_PI> udp_pi_sv = new UDP_sv<>(Proto_PI.class,
+                Integer.decode(FileSystem.getConfig("PI.port")),
+                "Raspberry PI UDP Server"
+        );
         
         // Start AZGO tcp interface server
-        TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(Proto_AZGO.class,21111,"AZGO TCP/IP Server");
-        try {
-            tcp_azgo_sv.start();
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        if (FileSystem.getConfig("AZGO.status").equals("ON")) {
+            try {
+                tcp_azgo_sv.start();
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         // Start PHP tcp interface server
-        TCP_sv<Proto_PHP> tcp_php_sv = new TCP_sv<>(Proto_PHP.class,21112,"PHP TCP/IP Server");
-        try {
-            tcp_php_sv.start();
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        if (FileSystem.getConfig("PHP.status").equals("ON")) {
+            try {
+                tcp_php_sv.start();
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
-        
         // Start SDR udp server
-        UDP_sv<Proto_PI> udp_pi_sv = new UDP_sv<>(Proto_PI.class,21113,"Raspberry PI UDP Server");
-        try {
-            udp_pi_sv.start();
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        if (FileSystem.getConfig("PI.status").equals("ON")) {
+            try {
+                udp_pi_sv.start();
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         synchronized(HOLDER) {

@@ -6,16 +6,16 @@
 package tools;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -25,13 +25,19 @@ import javax.imageio.ImageIO;
 public class FileSystem {
     private static final HashMap<String,String> CONFIG = new HashMap<>();
     
-    private static void loadDefaultConfig(){
-        CONFIG.put("PHP.status" , "ON");
-        CONFIG.put("PHP.port"   , "20501");
-        CONFIG.put("AZHO.status", "ON");
-        CONFIG.put("AZGO.port"  , "20502");
-        CONFIG.put("PI.status"  , "ON");
-        CONFIG.put("PI.port"    , "20503");
+    public static void loadDefaultConfig(){
+        BufferedReader txtReader = new BufferedReader(new InputStreamReader(FileSystem.class.getResourceAsStream("default.conf")));
+        try {
+            while(true){
+                String line = txtReader.readLine();
+                if (null == line)
+                    break;
+                String[] tokens = line.split("=");
+                CONFIG.put(tokens[0], tokens[1]);
+            }
+        } catch (IOException ex) {
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public static BufferedImage loadImage(String path){
@@ -39,7 +45,7 @@ public class FileSystem {
         try {
             img = ImageIO.read(new File(path));
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
             img = null;
         }
         return img;
@@ -51,7 +57,7 @@ public class FileSystem {
             ImageIO.write(img, "png", new File(path));
             flag = true;
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
             flag = false;
         }
         return flag;
@@ -63,7 +69,7 @@ public class FileSystem {
             for (Iterator<String> it = Files.readAllLines(Paths.get(path)).iterator(); it.hasNext();)
                 text.add(it.next());
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
         }
         return text;
     }
@@ -74,7 +80,7 @@ public class FileSystem {
             Files.write(Paths.get(path), data, StandardCharsets.UTF_8);
             flag = true;
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
             flag = false;
         }
         return flag;        
@@ -97,6 +103,13 @@ public class FileSystem {
         if (CONFIG.isEmpty())
             loadDefaultConfig();
         
+        if (!CONFIG.containsKey(key)) 
+            System.err.println("Loading null config from key: " + key);
+            
         return CONFIG.get(key);
+    }
+    
+    public static void displayCurrentConfig(){
+        CONFIG.forEach((k,v) -> System.out.println(k + " | " + v));
     }
 }
