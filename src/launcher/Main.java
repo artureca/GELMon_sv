@@ -40,6 +40,8 @@ public class Main {
     public static void main(String[] args){
         // TODO code application logic here
         
+        FileSystem.loadConfig("wow.conf");
+        
         // Start AZGO tcp interface server
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(Proto_AZGO.class,21111,"AZGO TCP/IP Server");
         try {
