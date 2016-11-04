@@ -32,7 +32,8 @@ import java.io.PrintWriter;
 public class Proto_PHP extends Protocol {
 
     /**
-     * Simple Constructor. Just calls the superclass' constructor.
+     * Simple Constructor. Just calls the superclass' constructor and configures
+     * the upstream classes.
      * 
      * @param out the uplink channel (PrintWriter)
      * @param in the downlink channel (BufferedReader)
@@ -57,4 +58,5 @@ public class Proto_PHP extends Protocol {
         // no more Strings from this point forward, unless no other option
         return Logic.getHeatMap(Long.getLong(tokens[1]), Long.getLong(tokens[2]));
     }
+
 }

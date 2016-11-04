@@ -97,9 +97,10 @@ abstract public class Protocol extends Thread{
      *  Processes the downlink request and sends a response to uplink.
      *  It has to be implemented by sub-classes.
      * 
+     * @author Artur Antunes
      * @param received the downlink String
      * @return the uplink String
-     * @author Artur Antunes
      */
     abstract public String decode(String received);
+    
 }
