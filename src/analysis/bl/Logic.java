@@ -17,6 +17,10 @@
 
 package analysis.bl;
 
+import analysis.dsp.Heatmap;
+import java.awt.image.BufferedImage;
+import tools.FileSystem;
+
 /**
  * A class with static methods used to process the clients requests.
  * 
@@ -33,10 +37,27 @@ public class Logic {
      * @param date2
      * @return
      */
-    public static String getHeatMap(long date1, long date2){
-        String ret = "";
-
-        return ret;
+    public static String getHeatmap(Long date1, Long date2){
+        Double[][] values = new Double
+                [Heatmap.getBackground().getWidth()]
+                [Heatmap.getBackground().getHeight()];
+        
+        // Somehow get the values from the database
+        // Convert them from coordenates
+        
+        Heatmap heatmap = new Heatmap(values);
+        heatmap.generate();
+        BufferedImage image = heatmap.toBufferedImage();
+        String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
+        
+        while(!FileSystem.saveImage(imagePath.concat(".PNG"), image))
+            imagePath = MD5.crypt(imagePath);
+        
+        return imagePath;
+    }
+    
+    public static void setup() {
+        
     }
     
 }

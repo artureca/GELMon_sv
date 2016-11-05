@@ -11,7 +11,7 @@ import tools.*;
 
 /**
  *
- * @author artureca
+ * @author Artur Antunes
  */
 public class Proto_PI extends Protocol {
 
@@ -22,6 +22,11 @@ public class Proto_PI extends Protocol {
     @Override
     public String decode(String received) {
         return null;
+    }
+
+    @Override
+    public void setup() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

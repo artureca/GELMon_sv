@@ -31,8 +31,7 @@ import java.io.PrintWriter;
 public class Proto_AZGO extends Protocol {
 
     /**
-     * Simple Constructor. Just calls the superclass' constructor and configures
-     * the upstream classes.
+     * Simple Constructor. Just calls the superclass' constructor.
      * 
      * @param out the uplink channel (PrintWriter)
      * @param in the downlink channel (BufferedReader)
@@ -54,6 +53,11 @@ public class Proto_AZGO extends Protocol {
     private String handlerLogin(String[] tokens){
         
         return "ok";
+    }
+
+    @Override
+    public void setup() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

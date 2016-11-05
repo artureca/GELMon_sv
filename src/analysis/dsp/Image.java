@@ -28,10 +28,25 @@ public class Image {
     private final Pixel[][] pixelMap;
     private final Integer width;
     private final Integer height;
-       
     
-    //public Image(BufferedImage im) {
-    //}
+    public Image(Integer width, Integer height){
+        this.pixelMap = new Pixel[width][height];
+        this.width = width;
+        this.height = height;
+        for (int i = 0; i < height; i++)
+            for (int j = 0; j < width; j++)
+                this.pixelMap[i][j] = new Pixel();
+    }
+    
+    /**
+     * Creates a Image from a BufferedImage.
+     * @param img
+     */
+    public Image(BufferedImage img) {
+        this.pixelMap=null;
+        this.width=0;
+        this.height=0;
+    }
 
     /**
      * 
@@ -41,8 +56,6 @@ public class Image {
      * @param width
      * @param height
      */
-   
-    
     public Image(Double[][] pop, Integer width, Integer height) {
       Integer w;
       Integer h;
@@ -52,6 +65,14 @@ public class Image {
             this.pixelMap[w][h]= new Pixel(pop[w][h]);
       this.width=width;
       this.height=height;
+    }
+
+    public Integer getWidth() {
+        return width;
+    }
+
+    public Integer getHeight() {
+        return height;
     }
     
     /**
@@ -68,5 +89,21 @@ public class Image {
             for (h=0;h<height;h++)
                 image.setRGB(w, h,this.pixelMap[w][h].toARGB());
         return image;
+    }
+    
+    /**
+     * Overlaps the current Image with another image (fg).
+     * @param fg the foreground image to overlap
+     */
+    public void overlap(Image fg){
+        
+    }
+    
+    /**
+     * Underlaps the current Image with another image (bg).
+     * @param bg the background image to overlap
+     */
+    public void underlap(Image bg){
+        
     }
 }

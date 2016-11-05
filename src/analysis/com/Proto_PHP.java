@@ -32,8 +32,7 @@ import java.io.PrintWriter;
 public class Proto_PHP extends Protocol {
 
     /**
-     * Simple Constructor. Just calls the superclass' constructor and configures
-     * the upstream classes.
+     * Simple Constructor. Just calls the superclass' constructor.
      * 
      * @param out the uplink channel (PrintWriter)
      * @param in the downlink channel (BufferedReader)
@@ -46,17 +45,22 @@ public class Proto_PHP extends Protocol {
     public String decode(String received){
         String[] tokens = received.split("@");
         switch (tokens[0]){
-            case "heatmap": return handlerHeatMap(tokens);
+            case "heatmap": return handlerHeatmap(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return null;
         }
     }
     
-    private String handlerHeatMap(String[] tokens) {
+    private String handlerHeatmap(String[] tokens) {
         // no need to complicate stuff
         // the logic must be passed with the correct format!!!
         // no more Strings from this point forward, unless no other option
-        return Logic.getHeatMap(Long.getLong(tokens[1]), Long.getLong(tokens[2]));
+        return Logic.getHeatmap(Long.decode(tokens[1]), Long.decode(tokens[2]));
+    }
+
+    @Override
+    public void setup() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
