@@ -106,4 +106,11 @@ public class Image {
     public void underlap(Image bg){
         
     }
+    
+    /**
+     *
+     */
+    public void antiAlias(){
+        
+    }
 }

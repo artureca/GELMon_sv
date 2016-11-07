@@ -25,7 +25,7 @@ package analysis.dsp;
  * @author Vânia Vieira
  */
 
-public class Pixel {
+public final class Pixel {
     private Integer R;
     private Integer G;
     private Integer B;
@@ -38,6 +38,14 @@ public class Pixel {
     public Pixel(){
         R = G = B = 0;
         A = 1.0;
+    }
+    
+    /**
+     *
+     * @param pixel
+     */
+    public Pixel(Pixel pixel){
+        this.set(pixel);
     }
     
     /**
@@ -95,6 +103,17 @@ public class Pixel {
     }
 
     /**
+     *
+     * @param pixel
+     */
+    public void set(Pixel pixel){
+        this.A = pixel.A;
+        this.R = pixel.R;
+        this.G = pixel.G;
+        this.B = pixel.B;
+    }
+    
+    /**
      * Overlaps this pixel with another pixel.
      * 
      * @author Artur Antunes
@@ -118,18 +137,15 @@ public class Pixel {
         this.B = new Double(fg.A*fg.B + bg.A*bg.B - fg.A*bg.A*bg.B).intValue();
     }
     
-    /*
-    public Pixel add(Pixel other){
-        Pixel res = new Pixel();
-        res.R = new Double(this.A*this.R + other.A*other.R).intValue();
-        res.G = new Double(this.A*this.G + other.A*other.G).intValue();
-        res.B = new Double(this.A*this.B + other.A*other.B).intValue();
-        if (res.R > 0xFF) res.R = 0xFF;
-        if (res.G > 0xFF) res.G = 0xFF;
-        if (res.B > 0xFF) res.B = 0xFF;
-        return res;
+    /**
+     *
+     * @param bg
+     */
+    public void underlap(Pixel bg){
+        Pixel copy = new Pixel(bg);
+        copy.overlap(this);
+        this.set(copy);
     }
-    */
 
     /**
      * Gets the Pixel's argb integer value (TYPE_INT_ARGB).

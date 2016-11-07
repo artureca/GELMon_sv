@@ -38,6 +38,11 @@ public class Logic {
      * @return
      */
     public static String getHeatmap(Long date1, Long date2){
+        
+        // verify if it already existes in DB
+        // if so, return path
+        // wait if being processed
+        
         Double[][] values = new Double
                 [Heatmap.getBackground().getWidth()]
                 [Heatmap.getBackground().getHeight()];
@@ -52,6 +57,9 @@ public class Logic {
         
         while(!FileSystem.saveImage(imagePath.concat(".PNG"), image))
             imagePath = MD5.crypt(imagePath);
+        
+        // update database
+        // wake up waiting threads
         
         return imagePath;
     }
