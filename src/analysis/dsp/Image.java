@@ -29,6 +29,11 @@ public class Image {
     private final Integer width;
     private final Integer height;
     
+    /**
+     * Creates a matrix of pixels
+     * @param width
+     * @param height
+     */
     public Image(Integer width, Integer height){
         this.pixelMap = new Pixel[width][height];
         this.width = width;
@@ -49,7 +54,7 @@ public class Image {
     }
 
     /**
-     * 
+     * Fill the pixel matrix with the population values.
      * @author Raquel Ribeiro
      * @author Vânia Vieira
      * @param pop
@@ -92,11 +97,24 @@ public class Image {
     }
     
     /**
+     * Obtain a pixel in localization x and y
+     * @param x correspond to local width-axis
+     * @param y correspond to local height-axis
+     * @return a pixel with coordinates x and y
+     */
+    public Pixel getPixel(Integer x, Integer y){
+        return this.pixelMap[x][y];
+    }    
+    /**
      * Overlaps the current Image with another image (fg).
      * @param fg the foreground image to overlap
      */
     public void overlap(Image fg){
-        
+        Integer w;
+        Integer h;
+        for (w=0;w<this.width;w++)
+            for (h=0;h<this.height;h++)
+                this.pixelMap[w][h].overlap(fg.getPixel(w, h));
     }
     
     /**
@@ -104,7 +122,11 @@ public class Image {
      * @param bg the background image to overlap
      */
     public void underlap(Image bg){
-        
+        Integer w;
+        Integer h;
+        for (w=0;w<this.width;w++)
+            for (h=0;h<this.height;h++)
+                this.pixelMap[w][h].underlap(bg.getPixel(w, h));   
     }
     
     /**

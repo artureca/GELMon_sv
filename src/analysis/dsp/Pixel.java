@@ -164,5 +164,7 @@ public final class Pixel {
         argb |= this.B;
         return argb;
     }
+    
+    
  
 }
