@@ -20,7 +20,7 @@ package analysis.dsp;
 import java.awt.image.BufferedImage;
 
 /**
- *
+ * Represents an image transformed in a matrix of pixels
  * @author Raquel Ribeiro
  * @author Vânia Vieira
  */
@@ -31,8 +31,10 @@ public class Image {
     
     /**
      * Creates a matrix of pixels
-     * @param width
-     * @param height
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
+     * @param width represents the widht of a matrix
+     * @param height represents the height of a matrix
      */
     public Image(Integer width, Integer height){
         this.pixelMap = new Pixel[width][height];
@@ -45,7 +47,9 @@ public class Image {
     
     /**
      * Creates a Image from a BufferedImage.
-     * @param img
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
+     * @param img represents a buffer of image data
      */
     public Image(BufferedImage img) {
         this.pixelMap=null;
@@ -57,9 +61,9 @@ public class Image {
      * Fill the pixel matrix with the population values.
      * @author Raquel Ribeiro
      * @author Vânia Vieira
-     * @param pop
-     * @param width
-     * @param height
+     * @param pop represents the value of population in a certain coordinate
+     * @param width represents the width of the matrix pop
+     * @param height represents the height of the matrix pop
      */
     public Image(Double[][] pop, Integer width, Integer height) {
       Integer w;
@@ -72,19 +76,29 @@ public class Image {
       this.height=height;
     }
 
+    /**
+     * Obtain a width
+     * @author Artur Antunes
+     * @return the width in a integer value 
+     */
     public Integer getWidth() {
         return width;
     }
 
+    /**
+     * Obtain a height
+     * @author Artur Antunes
+     * @return the height in a integer value
+     */
     public Integer getHeight() {
         return height;
     }
     
     /**
-     *
+     * Obtain a buffered image in RGB
      * @author Raquel Ribeiro
      * @author Vânia Vieira
-     * @return
+     * @return a RGB image in a buffered image type
      */
     public BufferedImage toBufferedImage() {
         Integer w;
@@ -98,6 +112,8 @@ public class Image {
     
     /**
      * Obtain a pixel in localization x and y
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
      * @param x correspond to local width-axis
      * @param y correspond to local height-axis
      * @return a pixel with coordinates x and y
@@ -107,6 +123,8 @@ public class Image {
     }    
     /**
      * Overlaps the current Image with another image (fg).
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
      * @param fg the foreground image to overlap
      */
     public void overlap(Image fg){
@@ -119,6 +137,8 @@ public class Image {
     
     /**
      * Underlaps the current Image with another image (bg).
+     * @author Raquel Ribeiro
+     * @author Vânia Vieira
      * @param bg the background image to overlap
      */
     public void underlap(Image bg){
