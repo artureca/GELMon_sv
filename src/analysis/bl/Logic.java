@@ -21,6 +21,8 @@ import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
 import tools.FileSystem;
 
+import org.apache.commons.math3.analysis.function.Gaussian;
+
 /**
  * A class with static methods used to process the clients requests.
  * 
@@ -39,29 +41,72 @@ public class Logic {
      */
     public static String getHeatmap(Long date1, Long date2){
         
+        String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
+        if (FileSystem.fileExists("./public_html/images/" + imagePath + ".png")) {
+            return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
+        }
         // verify if it already existes in DB
         // if so, return path
         // wait if being processed
         
+        /*Double[][] values = new Double
+        [Heatmap.getBackground().getWidth()]
+        [Heatmap.getBackground().getHeight()];
+        
+        fillUp4Testing(
+        values,
+        Heatmap.getBackground().getWidth(),
+        Heatmap.getBackground().getHeight(),
+        date1,
+        date2);*/
+        
         Double[][] values = new Double
-                [Heatmap.getBackground().getWidth()]
-                [Heatmap.getBackground().getHeight()];
+                [1000]
+                [1000];
+        
+        for (int i = 0; i < 1000; i++)
+            for (int j = 0; j < 1000; j++)
+                values[i][j] = (i + j) * 1.0/2000;
+            
+        
         
         // Somehow get the values from the database
         // Convert them from coordenates
         
         Heatmap heatmap = new Heatmap(values);
-        heatmap.generate();
+        //heatmap.generate();
         BufferedImage image = heatmap.toBufferedImage();
-        String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
         
-        while(!FileSystem.saveImage(imagePath.concat(".PNG"), image))
+        while(!FileSystem.saveImage("./public_html/images/" + imagePath + ".png", image))
             imagePath = MD5.crypt(imagePath);
         
         // update database
         // wake up waiting threads
         
-        return imagePath;
+        return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
+    }
+    
+    private static void fillUp4Testing(Double[][] pop, int width, int height, long time1, long time2){
+        Integer w;
+        Integer h;
+        Double max = 0.0;
+        //Integer scale = 100;
+        Double dev = 0.3;
+        Gaussian disth = new Gaussian(time1%height,dev);
+        Gaussian distw = new Gaussian(time2%width,dev);
+        
+        for (w=0;w<width;w++)
+            for (h=0;h<height;h++){
+                //pop[w][h]= (w + h) * 1.0 / (width + height);
+                pop[w][h]= distw.value(w * 1.0/width) * disth.value(h * 1.0/height);
+                if (pop[w][h]>max)
+                    max = pop[w][h];
+                //System.out.println("W: " + w + " | H: " + h + " | V: " + pop[w][h] + " | P: " + new Pixel(pop[w][h]));
+            }
+        
+        for (w=0;w<width;w++)
+            for (h=0;h<height;h++)
+                pop[w][h] = pop[w][h] / max;
     }
     
     public static void setup() {

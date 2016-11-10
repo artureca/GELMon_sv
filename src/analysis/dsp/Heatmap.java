@@ -13,7 +13,8 @@ public class Heatmap extends Image{
     private static Image background = null;
     
     public Heatmap(Double[][] pop) {
-        super(pop, background.getWidth(), background.getHeight());
+        //super(pop, background.getWidth(), background.getHeight());
+        super(pop, 1000, 1000);
     }
     
     public void generate(){

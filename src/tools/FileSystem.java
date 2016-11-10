@@ -25,6 +25,13 @@ import javax.imageio.ImageIO;
 public class FileSystem {
     private static final HashMap<String,String> CONFIG = new HashMap<>();
     
+    public static Boolean fileExists(String path){
+        File f = new File(path);
+        if(f.exists() && !f.isDirectory())
+            return true;
+        return false;
+    }
+    
     public static void loadDefaultConfig(){
         BufferedReader txtReader = new BufferedReader(new InputStreamReader(FileSystem.class.getResourceAsStream("default.conf")));
         try {
@@ -54,7 +61,10 @@ public class FileSystem {
     public static Boolean saveImage(String path, BufferedImage img){
         Boolean flag;
         try {
-            ImageIO.write(img, "png", new File(path));
+            File imgFile = new File(path);
+            imgFile.getParentFile().mkdirs();
+            imgFile.createNewFile();
+            ImageIO.write(img, "png", imgFile);
             flag = true;
         } catch (IOException ex) {
             //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
