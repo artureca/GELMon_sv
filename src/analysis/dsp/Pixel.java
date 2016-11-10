@@ -148,6 +148,21 @@ public final class Pixel {
     }
 
     /**
+     *
+     * @param factor
+     */
+    public void darken(Double factor){
+        if (factor > 1)
+            return;
+        
+        this.A = factor * this.A;
+        this.R = new Double(factor * this.R).intValue();
+        this.G = new Double(factor * this.G).intValue();
+        this.B = new Double(factor * this.B).intValue();
+    }
+    
+    
+    /**
      * Gets the Pixel's argb integer value (TYPE_INT_ARGB).
      * 
      * @author Artur Antunes
