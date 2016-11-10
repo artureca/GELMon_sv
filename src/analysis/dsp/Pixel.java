@@ -148,8 +148,9 @@ public final class Pixel {
     }
 
     /**
-     *
-     * @param factor
+     * Reduce the transparency of an image and make it darker
+     * @author Artur Antunes
+     * @param factor has the purpose of decrease A and increase the RGB
      */
     public void darken(Double factor){
         if (factor > 1)

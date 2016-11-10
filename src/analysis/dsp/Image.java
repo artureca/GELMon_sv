@@ -18,6 +18,7 @@
 package analysis.dsp;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Represents an image transformed in a matrix of pixels
@@ -150,9 +151,14 @@ public class Image {
     }
     
     /**
-     *
+     * @param coef
+     * @param r
      */
-    public void antiAlias(){
-        
+    public void antiAlias(Double[][] coef, Integer r){
+       Integer i;
+       Integer j;
+    /*   this.getPixel(i, j); */
+       
+       
     }
 }
