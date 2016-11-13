@@ -18,6 +18,7 @@
 package launcher;
 
 import analysis.com.*;
+import analysis.db.MySQL;
 import sdr.com.*;
 import tools.*;
 import java.io.IOException;
@@ -30,8 +31,7 @@ import java.util.logging.Logger;
  * @author Artur Antunes
  */
 public class Main {
-    private static final Boolean HOLDER = false;
-    
+    private static final Boolean HOLDER = false;  
     /**
      * A simple daemon launcher.
      * @param args the command line arguments
@@ -39,7 +39,8 @@ public class Main {
      */
     public static void main(String[] args){
         // TODO code application logic here
-        
+        MySQL connect = new MySQL();
+          
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
         //FileSystem.displayCurrentConfig();
         
@@ -99,5 +100,4 @@ public class Main {
         }
         
     }
-    
 }
