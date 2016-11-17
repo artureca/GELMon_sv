@@ -42,7 +42,9 @@ public class Main {
         MySQL connect = new MySQL();
           
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
-        //FileSystem.displayCurrentConfig();
+        FileSystem.displayCurrentConfig();
+        
+        analysis.bl.Logic.setup();
         
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
                 Proto_AZGO.class,
