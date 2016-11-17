@@ -79,6 +79,39 @@ public class Logic {
         return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
     }
     
+    private static Double[][] Smooth(Double[][] data,Integer w, Integer h){
+        double[][] matriz= {
+            {1,2,3,2,1},
+            {2,3,4,3,2},
+            {3,4,5,4,3},
+            {2,3,4,3,2},
+            {1,2,3,2,1}
+        };
+        double total = 73;
+    
+        Double[][] res= new Double[w][h];
+
+        for (int i=0;i<w;i++){
+            for (int j=0;j<h;j++){ 
+                res[i][j]=0.0;
+                //else
+                for (int t=0;t<5;t++){
+                    for (int l=0;l<5;l++){
+                      res[i][j]+=data[i+t-2][j+t-2]*matriz[t][l];   
+                    }
+                }
+                res[i][j] /= total;
+            }
+        }
+        return res;
+    }
+    
+    private static int rec(Double[][]data, Integer w, Integer h, Integer wmax, Integer hmax){
+        if (w<0 || h<0 || w>wmax || h>hmax){
+        }
+        return w;
+    }
+    
     public static void setup() {
         
     }
