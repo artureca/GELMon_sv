@@ -149,23 +149,5 @@ public class Image {
             for (h=0;h<this.height;h++)
                 this.pixelMap[w][h].underlap(bg.getPixel(w, h));   
     }
-    
-    /**
-     * @param coef
-     * @param r
-     */
-    public void antiAlias(Double[][] coef, Integer r){
-       Integer i;
-       Integer j;
-       Integer a;
-       Integer b;
-    /*   this.getPixel(i, j); */
-    for (i=0;i<this.width;i++)
-      for (j=0;j<this.height;j++)
-        for (a=(i-r);a<=(i+r);a++)
-            for (b=(j-r);b<=(j+r);b++)
-                ;
-                
-       
-    }
+
 }
