@@ -94,22 +94,26 @@ public class Logic {
         for (int i=0;i<w;i++){
             for (int j=0;j<h;j++){ 
                 res[i][j]=0.0;
-                //else
-                for (int t=0;t<5;t++){
-                    for (int l=0;l<5;l++){
-                      res[i][j]+=data[i+t-2][j+t-2]*matriz[t][l];   
-                    }
-                }
+                for (int t=0;t<5;t++)
+                    for (int l=0;l<5;l++)
+                      res[i][j] += getMirroredValue(data, i+t-2, j+t-2, w, h) * matriz[t][l];
                 res[i][j] /= total;
             }
         }
         return res;
     }
     
-    private static int rec(Double[][]data, Integer w, Integer h, Integer wmax, Integer hmax){
-        if (w<0 || h<0 || w>wmax || h>hmax){
-        }
-        return w;
+    private static Double getMirroredValue(Double[][]data, Integer i, Integer j, Integer w, Integer h){
+        if (i<0)
+            return getMirroredValue(data, i+1, j, w, h);
+        if (j<0)
+            return getMirroredValue(data, i, j+1, w, h);
+        if (i>=w)
+            return getMirroredValue(data, i-1, j, w, h);
+        if (j>=h)
+            return getMirroredValue(data, i, j-1, w, h);
+        
+        return data[i][j];
     }
     
     public static void setup() {
