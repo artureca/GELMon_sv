@@ -103,5 +103,4 @@ abstract public class Protocol extends Thread{
      */
     abstract public String decode(String received);
     
-    abstract public void setup();
 }

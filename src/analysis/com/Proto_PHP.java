@@ -58,9 +58,5 @@ public class Proto_PHP extends Protocol {
         return Logic.getHeatmap(Long.decode(tokens[1]), Long.decode(tokens[2]));
     }
 
-    @Override
-    public void setup() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
 }

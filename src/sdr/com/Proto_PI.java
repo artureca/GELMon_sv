@@ -24,9 +24,5 @@ public class Proto_PI extends Protocol {
         return null;
     }
 
-    @Override
-    public void setup() {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
 }
