@@ -48,19 +48,26 @@ public class Logic {
         // if so, return path
         // wait if being processed
         
-        /*Double[][] values = new Double
-        [Heatmap.getBackground().getWidth()]
-        [Heatmap.getBackground().getHeight()];
-        */
+        if (null == Heatmap.getBackground())
+            return "ERROR : heatmap background null!!!";
         
+            
+        
+        Double[][] values = new Double
+            [Heatmap.getBackground().getWidth()]
+            [Heatmap.getBackground().getHeight()];
+        
+        
+        /*
         Double[][] values = new Double
                 [1000]
                 [1000];
         
+        
         for (int i = 0; i < 1000; i++)
             for (int j = 0; j < 1000; j++)
                 values[i][j] = (i + j) * 1.0/2000;
-            
+        */    
         
         
         // Somehow get the values from the database
@@ -117,7 +124,7 @@ public class Logic {
     }
     
     public static void setup() {
-        
+        Heatmap.setup();
     }
     
 }

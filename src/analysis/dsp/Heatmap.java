@@ -5,6 +5,8 @@
  */
 package analysis.dsp;
 
+import tools.FileSystem;
+
 /**
  *
  * @author Artur Antunes
@@ -27,9 +29,9 @@ public class Heatmap extends Image{
     public static Image getBackground() {
         return background;
     }
-
-    public static void setBackground(Image background) {
-        Heatmap.background = background;
+    
+    public static void setup(){
+        background = new Image(FileSystem.loadImage(FileSystem.getConfig("HEATMAP.background")));
     }
     
 }

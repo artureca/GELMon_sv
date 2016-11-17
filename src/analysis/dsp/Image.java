@@ -18,7 +18,6 @@
 package analysis.dsp;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /**
  * Represents an image transformed in a matrix of pixels
