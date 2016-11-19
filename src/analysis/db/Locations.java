@@ -80,6 +80,34 @@ public class Locations {
      return (arrayList);   
     }
     
+    public  ArrayList<String> getTimeLocation(Connection con,Timestamp i_time,Timestamp f_time){
+       
+        ArrayList<String> arrayList = new ArrayList<String>(); 
+        
+        try{
+            String query= "SELECT l_time FROM locations WHERE l_time >= ? and l_time <= ? ";
+            st1 = con.prepareStatement(query);
+            st1.setTimestamp(1,i_time);
+            st1.setTimestamp(2,f_time);
+            rs=st1.executeQuery();
+            
+            while(rs.next()){
+            
+                
+                    
+                    arrayList.add(rs.getString("l_time"));
+                    
+             
+
+            }
+           
+         
+        }catch(Exception ex){
+            System.out.println("getLocation error:"+ex);
+        }
+        
+     return (arrayList);   
+    }
     
     
     
