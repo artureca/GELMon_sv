@@ -15,8 +15,8 @@ public class Heatmap extends Image{
     private static Image background = null;
     
     public Heatmap(Double[][] pop) {
-        //super(pop, background.getWidth(), background.getHeight());
-        super(pop, 1000, 1000);
+        super(pop, background.getWidth(), background.getHeight());
+        //super(pop, 1000, 1000);
     }
     
     public void generate(){
@@ -31,6 +31,7 @@ public class Heatmap extends Image{
     }
     
     public static void setup(){
+        System.out.println(FileSystem.loadImage(FileSystem.getConfig("HEATMAP.background").toString()));
         background = new Image(FileSystem.loadImage(FileSystem.getConfig("HEATMAP.background")));
     }
     

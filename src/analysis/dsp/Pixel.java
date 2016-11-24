@@ -106,6 +106,17 @@ public final class Pixel {
      *
      * @param pixel
      */
+    public void set(Pixel pixel, Double racio){
+        this.A = pixel.A / racio;
+        this.R = pixel.R;
+        this.G = pixel.G;
+        this.B = pixel.B;
+    }
+    
+    /**
+     *
+     * @param pixel
+     */
     public void set(Pixel pixel){
         this.A = pixel.A;
         this.R = pixel.R;
@@ -143,6 +154,16 @@ public final class Pixel {
      */
     public void underlap(Pixel bg){
         Pixel copy = new Pixel(bg);
+        copy.overlap(this);
+        this.set(copy);
+    }
+    
+    /**
+     *
+     * @param bg
+     */
+    public void underlap(Pixel bg, Double racio){
+        Pixel copy = new Pixel(bg, racio);
         copy.overlap(this);
         this.set(copy);
     }

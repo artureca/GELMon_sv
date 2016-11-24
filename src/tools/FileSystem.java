@@ -16,6 +16,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -52,7 +54,7 @@ public class FileSystem {
         try {
             img = ImageIO.read(new File(path));
         } catch (IOException ex) {
-            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
             img = null;
         }
         return img;

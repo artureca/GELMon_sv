@@ -58,23 +58,20 @@ public class Logic {
             [Heatmap.getBackground().getHeight()];
         
         
-        /*
-        Double[][] values = new Double
-                [1000]
-                [1000];
         
         
-        for (int i = 0; i < 1000; i++)
-            for (int j = 0; j < 1000; j++)
-                values[i][j] = (i + j) * 1.0/2000;
-        */    
+        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
+            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
+                values[i][j] = (i + j) * 1.0/(Heatmap.getBackground().getWidth()+Heatmap.getBackground().getHeight());
+           
+    
         
         
         // Somehow get the values from the database
         // Convert them from coordenates
         
         Heatmap heatmap = new Heatmap(values);
-        //heatmap.generate();
+        heatmap.generate();
         BufferedImage image = heatmap.toBufferedImage();
         
         while(!FileSystem.saveImage("./public_html/images/" + imagePath + ".png", image))

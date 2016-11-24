@@ -40,9 +40,9 @@ public class Image {
         this.pixelMap = new Pixel[width][height];
         this.width = width;
         this.height = height;
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                this.pixelMap[i][j] = new Pixel();
+        for (int j = 0; j < width; j++)
+            for (int i = 0; i < height; i++)
+                this.pixelMap[j][i] = new Pixel();
     }
     
     /**
@@ -52,9 +52,21 @@ public class Image {
      * @param img represents a buffer of image data
      */
     public Image(BufferedImage img) {
-        this.pixelMap=null;
-        this.width=0;
-        this.height=0;
+        this.width = img.getWidth();
+        this.height = img.getHeight();
+        this.pixelMap = new Pixel[this.width][this.height];
+        
+        for (int j = 0; j < this.width; j++){
+            for (int i = 0; i < this.height; i++){
+                try{
+                    this.pixelMap[j][i] = new Pixel(img.getRGB(j, i));
+                }catch(Exception ex){
+                    System.out.println("i: "+i+"| j: "+j);
+                    throw ex;
+                }
+            }
+        }
+        
     }
 
     /**
@@ -69,12 +81,10 @@ public class Image {
       Integer w;
       Integer h;
       this.pixelMap = new Pixel[width][height]; 
-      for (w=0;w<width;w++)
+      for (w=0;w<width;w++){
           for (h=0;h<height;h++){
             this.pixelMap[w][h]= new Pixel(pop[w][h]);
-            System.out.println('w' + w);
-            System.out.println('h' + h);
-          }
+          }}
       this.width=width;
       this.height=height;
     }
@@ -107,9 +117,14 @@ public class Image {
         Integer w;
         Integer h;
         BufferedImage image = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
-        for (w=0;w<width;w++)
-            for (h=0;h<height;h++)
+       
+        for (w=0;w<width;w++){
+                //System.out.print(this.pixelMap[w][0].toARGB());
+            for (h=0;h<height;h++){
                 image.setRGB(w, h,this.pixelMap[w][h].toARGB());
+            }
+        }
+         System.out.println();
         return image;
     }
     
@@ -147,9 +162,10 @@ public class Image {
     public void underlap(Image bg){
         Integer w;
         Integer h;
+        Double racio = 0.5;
         for (w=0;w<this.width;w++)
             for (h=0;h<this.height;h++)
-                this.pixelMap[w][h].underlap(bg.getPixel(w, h));   
+                this.pixelMap[w][h].underlap(bg.getPixel(w, h),racio);   
     }
 
 }
