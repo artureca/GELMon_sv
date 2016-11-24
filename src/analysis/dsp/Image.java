@@ -70,8 +70,11 @@ public class Image {
       Integer h;
       this.pixelMap = new Pixel[width][height]; 
       for (w=0;w<width;w++)
-          for (h=0;h<height;h++)
+          for (h=0;h<height;h++){
             this.pixelMap[w][h]= new Pixel(pop[w][h]);
+            System.out.println('w' + w);
+            System.out.println('h' + h);
+          }
       this.width=width;
       this.height=height;
     }
