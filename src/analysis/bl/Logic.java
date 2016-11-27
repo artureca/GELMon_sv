@@ -19,6 +19,8 @@ package analysis.bl;
 
 import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import tools.FileSystem;
 
 
@@ -122,6 +124,102 @@ public class Logic {
     
     public static void setup() {
         Heatmap.setup();
+    }
+    
+    public static int[] getNumberOfLocationsByHour (){
+        
+        int i;
+        int[] num = new int[24]; //Array com pessoas/hora
+        Timestamp la; //Variavel para converter string para timestamp
+        
+        String inicio = "2016-03-01 00:00:00"; //Data inicio para pesquisa(query) na DB
+        la = Timestamp.valueOf(inicio);
+        Long inicionum = la.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        //System.out.println(inicionum);
+        
+        String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(query) na DB
+        la = Timestamp.valueOf(fin);
+        Long finnum = la.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        //System.out.println(finnum);
+        
+        ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
+        ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
+        
+       // --------------------------------------------------------------------------------------------
+        all.add("2016-03-01 13:15:15");
+        all.add("2016-03-01 13:00:00");
+        all.add("2016-03-01 00:00:00");
+        all.add("2016-03-01 16:00:00");         //Substituir por funcao da base de dados
+        all.add("2016-03-01 20:10:15");         //Pode-se aproveitar a lista all na mesma
+        all.add("2016-03-01 22:45:00");
+        all.add("2016-03-01 08:30:00");
+        all.add("2016-03-01 10:15:15");
+      // ---------------------------------------------------------------------------------------------
+        
+        
+        for (i=0; i<all.size(); i++){           //Converte lista de strings para long
+            la = Timestamp.valueOf(all.get(i));
+            nmr.add(la.getTime()/1000);         //Elimina 0s a mais
+        }
+        
+        for (i=0; i<nmr.size(); i++){           //Contagem das pessoas/hora
+            //System.out.println(nmr.get(i));
+            if((nmr.get(i)>=inicionum) && (nmr.get(i)<inicionum+3600))
+                num[0]++;
+            if((nmr.get(i)>=inicionum+3600) && (nmr.get(i)<inicionum+(3600*2)))
+                num[1]++;
+            if((nmr.get(i)>=inicionum+(3600*2)) && (nmr.get(i)<inicionum+(3600*3)))
+                num[2]++;
+            if((nmr.get(i)>=inicionum+(3600*3)) && (nmr.get(i)<inicionum+(3600*4)))
+                num[3]++;
+            if((nmr.get(i)>=inicionum+(3600*4)) && (nmr.get(i)<inicionum+(3600*5)))
+                num[4]++;
+            if((nmr.get(i)>=inicionum+(3600*5)) && (nmr.get(i)<inicionum+(3600*6)))
+                num[5]++;
+            if((nmr.get(i)>=inicionum+(3600*6)) && (nmr.get(i)<inicionum+(3600*7)))
+                num[6]++;
+            if((nmr.get(i)>=inicionum+(3600*7)) && (nmr.get(i)<inicionum+(3600*8)))
+                num[7]++;
+            if((nmr.get(i)>=inicionum+(3600*8)) && (nmr.get(i)<inicionum+(3600*9)))
+                num[8]++;
+            if((nmr.get(i)>=inicionum+(3600*9)) && (nmr.get(i)<inicionum+(3600*10)))
+                num[9]++;
+            if((nmr.get(i)>=inicionum+(3600*10)) && (nmr.get(i)<inicionum+(3600*11)))
+                num[10]++;
+            if((nmr.get(i)>=inicionum+(3600*11)) && (nmr.get(i)<inicionum+(3600*12)))
+                num[11]++;
+            if((nmr.get(i)>=inicionum+(3600*12)) && (nmr.get(i)<inicionum+(3600*13)))
+                num[12]++;
+            if((nmr.get(i)>=inicionum+(3600*13)) && (nmr.get(i)<inicionum+(3600*14)))
+                num[13]++;
+            if((nmr.get(i)>=inicionum+(3600*14)) && (nmr.get(i)<inicionum+(3600*15)))
+                num[14]++;
+            if((nmr.get(i)>=inicionum+(3600*15)) && (nmr.get(i)<inicionum+(3600*16)))
+                num[15]++;
+            if((nmr.get(i)>=inicionum+(3600*16)) && (nmr.get(i)<inicionum+(3600*17)))
+                num[16]++;
+            if((nmr.get(i)>=inicionum+(3600*17)) && (nmr.get(i)<inicionum+(3600*18)))
+                num[17]++;
+            if((nmr.get(i)>=inicionum+(3600*18)) && (nmr.get(i)<inicionum+(3600*19)))
+                num[18]++;
+            if((nmr.get(i)>=inicionum+(3600*19)) && (nmr.get(i)<inicionum+(3600*20)))
+                num[19]++;
+            if((nmr.get(i)>=inicionum+(3600*20)) && (nmr.get(i)<inicionum+(3600*21)))
+                num[20]++;
+            if((nmr.get(i)>=inicionum+(3600*21)) && (nmr.get(i)<inicionum+(3600*22)))
+                num[21]++;
+            if((nmr.get(i)>=inicionum+(3600*22)) && (nmr.get(i)<inicionum+(3600*23)))
+                num[22]++;
+            if((nmr.get(i)>=inicionum+(3600*23)) && (nmr.get(i)<inicionum+(3600*24)))
+                num[23]++;
+        }
+        
+        //Timestamp la = Timestamp.valueOf(test);
+        /*for(i=0; i<24; i++){
+           System.out.println(i + ":" + num[i]);
+        }*/
+        //System.out.println(la.getTime()/1000);
+        return num;
     }
     
 }
