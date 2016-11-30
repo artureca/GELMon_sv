@@ -46,6 +46,7 @@ public class Proto_PHP extends Protocol {
         String[] tokens = received.split("@");
         switch (tokens[0]){
             case "heatmap": return handlerHeatmap(tokens);
+            //case "video": return handlerVideo(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return null;
         }
