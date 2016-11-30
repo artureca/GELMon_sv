@@ -162,10 +162,10 @@ public class Logic {
       */
         
         MySQL test = new MySQL();
-        Connection con = test.Connection();
+        Connection con = test.Connection();     //Inicializacao da coneccao
         
         Locations loc = new Locations();
-        all = loc.getTimeLocation(con, iniciots, fimts);
+        all = loc.getTimeLocation(con, iniciots, fimts);    //Busca a DB
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
