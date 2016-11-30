@@ -32,7 +32,7 @@ public class MySQL {
     static final String PASS = "setec1617";
     
     
-     public  MySQL() {
+     public Connection Connection() {
             
         Connection con = null; 
          
@@ -40,12 +40,12 @@ public class MySQL {
             
             Class.forName(JDBC_DRIVER);
             con = DriverManager.getConnection(DB_URL,USER,PASS);
-            
+            return con;
         }catch (Exception ex){
             System.out.println("erro " +ex);
         }
     
-    
-    }
+     return null;
+    } 
     
 }
