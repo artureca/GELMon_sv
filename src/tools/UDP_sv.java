@@ -19,7 +19,7 @@ package tools;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import org.apache.commons.codec.binary.Hex;
+//import org.apache.commons.codec.binary.Hex;
 import java.net.*;
 import java.sql.Timestamp;
 import java.util.logging.Level;
@@ -114,7 +114,7 @@ public class UDP_sv <T extends Protocol> implements Daemon{
             byte[] rawData;
             rawData = new byte[this.bufferSize];
             data = new DatagramPacket(rawData,this.bufferSize);
-            System.out.println(Hex.encodeHexString(rawData));
+            //System.out.println(Hex.encodeHexString(rawData));
             try {
                 this.serverSocket.receive(data);
             } catch (IOException ex) {
