@@ -17,8 +17,10 @@
 
 package analysis.bl;
 
+import analysis.db.*;
 import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import tools.FileSystem;
@@ -131,21 +133,21 @@ public class Logic {
         int i, auxi;
         Long aux;
         int[] num = new int[24]; //Array com pessoas/hora
-        Timestamp la; //Variavel para converter string para timestamp
+        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
         
         String inicio = "2016-03-01 00:00:00"; //Data inicio para pesquisa(quary) na DB
-        la = Timestamp.valueOf(inicio);
-        Long inicionum = la.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        iniciots = Timestamp.valueOf(inicio);
+        Long inicionum = iniciots.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
         //System.out.println(inicionum);
         
         String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
-        la = Timestamp.valueOf(fin);
-        Long finnum = la.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        fimts = Timestamp.valueOf(fin);
+        Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
         //System.out.println(finnum);
         
         ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
         ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
-        
+      /*  
        // --------------------------------------------------------------------------------------------
         all.add("2016-03-01 13:15:15");
         all.add("2016-03-01 13:00:00");
@@ -157,9 +159,17 @@ public class Logic {
         all.add("2016-03-01 10:15:15");
         all.add("2016-03-01 23:59:59");
       // ---------------------------------------------------------------------------------------------
+      */
+        
+        MySQL test = new MySQL();
+        Connection con = test.Connection();
+        
+        Locations loc = new Locations();
+        all = loc.getTimeLocation(con, iniciots, fimts);
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
+            System.out.println(all.get(i));
             la = Timestamp.valueOf(all.get(i));
             nmr.add(la.getTime()/1000);         //Elimina 0s a mais
         }
