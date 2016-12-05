@@ -19,33 +19,33 @@ package analysis.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import tools.FileSystem;
 
 /**
  *
  * @author ???
  */
 public class MySQL {
+     
+    private static final String DB_URL = "jdbc:mysql://db.fe.up.pt:3306/setec16_17";
+    private static final String USER = "setec16_17";
+    private static final String PASS = "setec1617";
+    static Connection con = null;
     
-    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-    static final String DB_URL = "jdbc:mysql://db.fe.up.pt:3306/setec16_17";
-    static final String USER = "setec16_17";
-    static final String PASS = "setec1617";
-    
-    
-     public Connection Connection() {
-            
-        Connection con = null; 
+     public static void setup() {
          
         try{
             
-            Class.forName(JDBC_DRIVER);
-            con = DriverManager.getConnection(DB_URL,USER,PASS);
-            return con;
-        }catch (Exception ex){
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection(
+                    FileSystem.getConfig("MYSQL.url"),
+                    FileSystem.getConfig("MYSQL.user"),
+                    FileSystem.getConfig("MYSQL.password")
+            );
+        }catch (ClassNotFoundException | SQLException ex){
             System.out.println("erro " +ex);
         }
-    
-     return null;
     } 
     
 }

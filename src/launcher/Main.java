@@ -18,7 +18,6 @@
 package launcher;
 
 import analysis.com.*;
-import analysis.db.MySQL;
 import sdr.com.*;
 import tools.*;
 import java.io.IOException;
@@ -39,7 +38,6 @@ public class Main {
      */
     public static void main(String[] args){
         // TODO code application logic here
-        MySQL connect = new MySQL();
           
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
         FileSystem.displayCurrentConfig();

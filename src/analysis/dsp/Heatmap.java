@@ -31,7 +31,6 @@ public class Heatmap extends Image{
     }
     
     public static void setup(){
-        System.out.println(FileSystem.loadImage(FileSystem.getConfig("HEATMAP.background").toString()));
         background = new Image(FileSystem.loadImage(FileSystem.getConfig("HEATMAP.background")));
     }
     

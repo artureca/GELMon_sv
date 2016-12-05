@@ -5,7 +5,6 @@
  */
 package analysis.db;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -15,17 +14,15 @@ import java.util.ArrayList;
  *
  * @author Bruno
  */
-public class Locations {
+public class Locations extends MySQL{
     
-    public Locations() {
-        
-       
-    }
     
     PreparedStatement st1;
     ResultSet rs;
     
-    public boolean setLocation(Connection con,double latitude, double longitude,String tmsi,Timestamp l_time){
+    
+    
+    public boolean setLocation(double latitude, double longitude,String tmsi,Timestamp l_time){
         
         try{
             String query= "INSERT INTO locations (latitude,longitude,tmsi,l_time) values(?,?,?,?) ";
@@ -44,7 +41,7 @@ public class Locations {
     }
     
     
-    public  ArrayList<String> getLocation(Connection con,Timestamp i_time,Timestamp f_time){
+    public  ArrayList<String> getLocation(Timestamp i_time,Timestamp f_time){
        
         ArrayList<String> arrayList = new ArrayList<String>(); 
         
@@ -80,7 +77,7 @@ public class Locations {
      return (arrayList);   
     }
     
-    public  ArrayList<String> getTimeLocation(Connection con,Timestamp i_time,Timestamp f_time){
+    public  ArrayList<String> getTimeLocation(Timestamp i_time,Timestamp f_time){
        
         ArrayList<String> arrayList = new ArrayList<String>(); 
         

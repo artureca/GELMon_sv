@@ -20,7 +20,6 @@ package analysis.bl;
 import analysis.db.*;
 import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import tools.FileSystem;
@@ -45,7 +44,7 @@ public class Logic {
     public static String getHeatmap(Long date1, Long date2){
         
         String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
-        if (FileSystem.fileExists("./public_html/images/" + imagePath + ".png")) {
+        if (FileSystem.fileExists("./../public_html/images/" + imagePath + ".png")) {
             return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
         }
         // verify if it already existes in DB
@@ -78,7 +77,7 @@ public class Logic {
         heatmap.generate();
         BufferedImage image = heatmap.toBufferedImage();
         
-        while(!FileSystem.saveImage("./public_html/images/" + imagePath + ".png", image))
+        while(!FileSystem.saveImage("./../public_html/images/" + imagePath + ".png", image))
             imagePath = MD5.crypt(imagePath);
         
         // update database
@@ -126,6 +125,7 @@ public class Logic {
     
     public static void setup() {
         Heatmap.setup();
+        MySQL.setup();
     }
     
     public static int[] getNumberOfLocationsByHour (){
@@ -161,11 +161,8 @@ public class Logic {
       // ---------------------------------------------------------------------------------------------
       */
         
-        MySQL test = new MySQL();
-        Connection con = test.Connection();     //Inicializacao da coneccao
-        
         Locations loc = new Locations();
-        all = loc.getTimeLocation(con, iniciots, fimts);    //Busca a DB
+        all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
