@@ -5,6 +5,7 @@
  */
 package analysis.db;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
@@ -13,7 +14,7 @@ import java.sql.Timestamp;
  *
  * @author Bruno
  */
-public class Image {
+public class Image extends MySQL {
     
     
     
@@ -22,11 +23,11 @@ public class Image {
     
     PreparedStatement st1;
     
-    public boolean setImage(Connection conn,String path,Timestamp i_time,Timestamp f_time){
+    public boolean setImage(String path,Timestamp i_time,Timestamp f_time){
         
         try{
             String query= "INSERT INTO images (path,i_time,f_time) values(?,?,?) ";
-            st1 = conn.prepareStatement(query);
+            st1 = con.prepareStatement(query);
             st1.setString(1,path);
             st1.setTimestamp(2,i_time);
             st1.setTimestamp(3,f_time);
