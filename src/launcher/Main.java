@@ -17,6 +17,7 @@
 
 package launcher;
 
+import analysis.bl.Logic;
 import analysis.com.*;
 import sdr.com.*;
 import tools.*;
@@ -43,6 +44,12 @@ public class Main {
         FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
+        
+        System.out.println("DATABASE FUNCTIONS TEST");
+        System.out.println("-----------------------");
+        Logic log = new Logic();
+        System.out.println(log.getNumberOfLocationsByHour());   
+        System.out.println("-----------------------");
         
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
                 Proto_AZGO.class,
@@ -87,6 +94,9 @@ public class Main {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        
+        
         
         synchronized(HOLDER) {
             while (true) {
