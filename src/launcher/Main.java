@@ -17,12 +17,10 @@
 
 package launcher;
 
-import analysis.bl.Logic;
 import analysis.com.*;
 import sdr.com.*;
 import tools.*;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,13 +45,13 @@ public class Main {
         analysis.bl.Logic.setup();
         
         // THIS IS COMPLETLY RIGHT !!!
-        System.out.println("DATABASE FUNCTIONS TEST");
-        System.out.println("-----------------------");
-        Timestamp iniciots = Timestamp.valueOf("2016-03-01 00:00:00");
-        Timestamp finalts = Timestamp.valueOf("2016-03-01 23:59:59");
-        Timestamp step = Timestamp.valueOf("2016-03-01 23:59:59");
-        System.out.println(Logic.getNumberOfLocationsByInterval(iniciots, finalts, 60));   
-        System.out.println("-----------------------");
+//        System.out.println("DATABASE FUNCTIONS TEST");
+//        System.out.println("-----------------------");
+//        Timestamp iniciots = Timestamp.valueOf("2016-03-01 00:00:00");
+//        Timestamp finalts = Timestamp.valueOf("2016-03-01 23:59:59");
+//        Timestamp step = Timestamp.valueOf("2016-03-01 23:59:59");
+//        System.out.println(Logic.getNumberOfLocationsByInterval(iniciots, finalts, 60));   
+//        System.out.println("-----------------------");
         
                 
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
