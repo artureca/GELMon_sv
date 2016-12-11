@@ -140,9 +140,12 @@ public class Logic {
         Long inicionum = iniciots.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
         //System.out.println(inicionum);
         
-        String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
-        fimts = Timestamp.valueOf(fin);
-        Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        Long finnum = (inicionum+86399)*1000;  //Data final calculado (00:00:00+23:59:59) para pesquisa(quary) na DB
+        fimts = new Timestamp(finnum);
+        
+        //String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
+        //fimts = Timestamp.valueOf(fin);
+        //Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
         //System.out.println(finnum);
         
         ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
@@ -175,6 +178,50 @@ public class Logic {
             //System.out.println(nmr.get(i));
             aux=nmr.get(i)-inicionum;
             aux=aux/3600;
+            auxi=aux.intValue();
+            num[auxi]++;
+        }
+        return num;
+    }
+    
+    public static int[] getNumberOfLocationsByDay (){ //Dias da semana
+        
+        int i, auxi;
+        Long aux;
+        int[] num = new int[7]; //Array com pessoas/hora
+        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
+        
+        String inicio = "2016-03-01 00:00:00"; //Data inicio para pesquisa(quary) na DB
+        iniciots = Timestamp.valueOf(inicio);
+        Long inicionum = iniciots.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        //System.out.println(inicionum);
+        
+        Long finnum = (inicionum+604799)*1000;  //Data final calculado (7 dias) para pesquisa(quary) na DB
+        fimts = new Timestamp(finnum);
+        
+        //String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
+        //fimts = Timestamp.valueOf(fin);
+        //Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        //System.out.println(finnum);
+        
+        ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
+        ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
+    
+        
+        Locations loc = new Locations();
+        all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
+        
+        
+        for (i=0; i<all.size(); i++){           //Converte lista de strings para long
+            System.out.println(all.get(i));
+            la = Timestamp.valueOf(all.get(i));
+            nmr.add(la.getTime()/1000);         //Elimina 0s a mais
+        }
+        
+        for (i=0; i<nmr.size(); i++){           //Contagem das pessoas/hora
+            //System.out.println(nmr.get(i));
+            aux=nmr.get(i)-inicionum;
+            aux=aux/86400;
             auxi=aux.intValue();
             num[auxi]++;
         }
