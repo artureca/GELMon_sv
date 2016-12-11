@@ -22,8 +22,8 @@ import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentSkipListSet;
 import tools.FileSystem;
-import static java.lang.Math.toIntExact;
 
 
 /**
@@ -36,8 +36,12 @@ public class Logic {
     
     
     private static String imgFolder;
+    private static String graphFolder;
 //    private static String vidFolder;
     private static String url;
+    
+    private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
+    private static final Object LOCK = new Object();
     
     /**
      * Gets the reqeusted heatmap path, creating it if it doesn't exist.
@@ -234,53 +238,52 @@ public class Logic {
      * @param step precision of the interval
      * @return
      */
-    public static int[] getNumberOfLocationsByInterval (Timestamp init, Timestamp fin, long step){
+    public static String getNumberOfLocationsByInterval (Long init, Long fin, Long step){
         
-        int i, j, auxi;
-        Long aux;
-        long l_init=init.getTime();
-        long l_fin=fin.getTime();
-        //long l_step=step.getTime();
-        int vectorsize = toIntExact((l_fin-l_init)/step);
-        System.out.println("Vector Size = "+vectorsize);
-        int[] num = new int[vectorsize]; //Array com pessoas/step
-        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
+        String fileName = MD5.crypt(init.toString() + fin.toString() + step.toString()) + ".dat";
+        String filePath = System.getenv("$HOME") + "/public_html/" + graphFolder + "/" + fileName ;
+        String fileURL = url + "/" + graphFolder + "/" + fileName ;
         
+        // should work, not sure. Comment if problems arise! ///////////////////
+        synchronized(LOCK){
+            while (true){
+                if (FileSystem.fileExists(filePath)) 
+                    return fileURL;
+                
+                if (PROCESSING.contains(fileName)) {
+                    try {
+                        LOCK.wait();
+                    } catch (InterruptedException ex) {}
+                }else{
+                    PROCESSING.add(fileName);
+                    break;
+                }
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////
         
-        Long inicionum = init.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        Long aux = ((fin-init)/step);
+        Integer[] num = new Integer[aux.intValue()];
+        ArrayList<Long> nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
+        ArrayList<String> ret = new ArrayList<>();
         
-        ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
-        ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
-        
-        Locations loc = new Locations();
-        
-        
-        //all = loc.getTimeLocation(init, fin);    //Busca a DB
-        
-        
-        for (i=0; i<all.size(); i++){           //Converte lista de strings para long
-            //System.out.println(all.get(i));
-            la = Timestamp.valueOf(all.get(i));
-            System.out.println(la);
-            nmr.add(la.getTime()/1000);         //Elimina 0s a mais
-            System.out.println(la.getTime()/1000);
+        for (Long time : nmr){
+            aux = (time - init) / step;
+            num[aux.intValue()]++;
         }
         
+        for (Integer i : num)
+            ret.add(i.toString());
         
+        FileSystem.saveText(filePath, ret);
         
-        for (i=0; i<nmr.size(); i++){           //Contagem das pessoas/hora
-            //System.out.println(nmr.get(i));
-            aux=nmr.get(i)-inicionum;
-            aux=aux/step;
-            auxi=aux.intValue();
-            num[auxi]++;
+        // should work, not sure. Comment if problems arise! ///////////////////
+        synchronized(LOCK){
+            PROCESSING.remove(fileName);
+            LOCK.notifyAll();
         }
-        
-        for (i=0; i<vectorsize; i++){
-            System.out.println("Hora "+i+" = "+num[i]);
-        }
-        
-        return num;
+        ////////////////////////////////////////////////////////////////////////
+        return fileURL;
     }
     
 }
