@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import tools.FileSystem;
+import static java.lang.Math.toIntExact;
 
 
 /**
@@ -34,9 +35,9 @@ import tools.FileSystem;
 public class Logic {
     
     
-//    private static String imgFolder;
+    private static String imgFolder;
 //    private static String vidFolder;
-//    private static String url;
+    private static String url;
     
     /**
      * Gets the reqeusted heatmap path, creating it if it doesn't exist.
@@ -48,31 +49,25 @@ public class Logic {
      */
     public static String getHeatmap(Long date1, Long date2){
         
-        String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
-        if (FileSystem.fileExists("~/public_html/images/" + imagePath + ".png")) {
-            return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
-        }
-        // verify if it already existes in DB
-        // if so, return path
+        String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+        String filePath = System.getenv("$HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
+        String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
+        
+        if (FileSystem.fileExists(filePath)) 
+            return fileURL;
+        
         // wait if being processed
         
         if (null == Heatmap.getBackground())
             return "ERROR : heatmap background null!!!";
         
-            
-        
         Double[][] values = new Double
             [Heatmap.getBackground().getWidth()]
             [Heatmap.getBackground().getHeight()];
         
-        
-        
-        
         for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
             for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
                 values[i][j] = (i + j) * 1.0/(Heatmap.getBackground().getWidth()+Heatmap.getBackground().getHeight());
-           
-    
         
         
         // Somehow get the values from the database
@@ -82,13 +77,12 @@ public class Logic {
         heatmap.generate();
         BufferedImage image = heatmap.toBufferedImage();
         
-        while(!FileSystem.saveImage("~/public_html/images/" + imagePath + ".png", image))
-            imagePath = MD5.crypt(imagePath);
+        FileSystem.saveImage(filePath, image);
         
         // update database
         // wake up waiting threads
         
-        return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
+        return fileURL;
     }
     
     private static Double[][] Smooth(Double[][] data,Integer w, Integer h){
@@ -230,6 +224,62 @@ public class Logic {
             auxi=aux.intValue();
             num[auxi]++;
         }
+        return num;
+    }
+    
+    /**
+     *Gets number of locations in DB between a given interval, with a precision defined by the step
+     * @param init initial date of the interval
+     * @param fin final date of the interval
+     * @param step precision of the interval
+     * @return
+     */
+    public static int[] getNumberOfLocationsByInterval (Timestamp init, Timestamp fin, long step){
+        
+        int i, j, auxi;
+        Long aux;
+        long l_init=init.getTime();
+        long l_fin=fin.getTime();
+        //long l_step=step.getTime();
+        int vectorsize = toIntExact((l_fin-l_init)/step);
+        System.out.println("Vector Size = "+vectorsize);
+        int[] num = new int[vectorsize]; //Array com pessoas/step
+        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
+        
+        
+        Long inicionum = init.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
+        
+        ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
+        ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
+        
+        Locations loc = new Locations();
+        
+        
+        all = loc.getTimeLocation(init, fin);    //Busca a DB
+        
+        
+        for (i=0; i<all.size(); i++){           //Converte lista de strings para long
+            //System.out.println(all.get(i));
+            la = Timestamp.valueOf(all.get(i));
+            System.out.println(la);
+            nmr.add(la.getTime()/1000);         //Elimina 0s a mais
+            System.out.println(la.getTime()/1000);
+        }
+        
+        
+        
+        for (i=0; i<nmr.size(); i++){           //Contagem das pessoas/hora
+            //System.out.println(nmr.get(i));
+            aux=nmr.get(i)-inicionum;
+            aux=aux/step;
+            auxi=aux.intValue();
+            num[auxi]++;
+        }
+        
+        for (i=0; i<vectorsize; i++){
+            System.out.println("Hora "+i+" = "+num[i]);
+        }
+        
         return num;
     }
     
