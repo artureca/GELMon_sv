@@ -17,7 +17,6 @@
 
 package launcher;
 
-import analysis.bl.Logic;
 import analysis.com.*;
 import sdr.com.*;
 import tools.*;
@@ -41,15 +40,16 @@ public class Main {
         // TODO code application logic here
           
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
-        FileSystem.displayCurrentConfig();
+        //FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
         
-        System.out.println("DATABASE FUNCTIONS TEST");
-        System.out.println("-----------------------");
-        Logic log = new Logic();
-        System.out.println(log.getNumberOfLocationsByHour());   
-        System.out.println("-----------------------");
+        // THIS IS COMPLETLY WRONG !!!
+//        System.out.println("DATABASE FUNCTIONS TEST");
+//        System.out.println("-----------------------");
+//        Logic log = new Logic();
+//        System.out.println(log.getNumberOfLocationsByHour());   
+//        System.out.println("-----------------------");
         
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
                 Proto_AZGO.class,

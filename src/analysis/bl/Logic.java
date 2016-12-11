@@ -33,6 +33,11 @@ import tools.FileSystem;
  */
 public class Logic {
     
+    
+//    private static String imgFolder;
+//    private static String vidFolder;
+//    private static String url;
+    
     /**
      * Gets the reqeusted heatmap path, creating it if it doesn't exist.
      * 
@@ -44,7 +49,7 @@ public class Logic {
     public static String getHeatmap(Long date1, Long date2){
         
         String imagePath = MD5.crypt(date1.toString().concat(date2.toString()));
-        if (FileSystem.fileExists("./../public_html/images/" + imagePath + ".png")) {
+        if (FileSystem.fileExists("~/public_html/images/" + imagePath + ".png")) {
             return "http://paginas.fe.up.pt/~setec16_17/images/" + imagePath + ".png";
         }
         // verify if it already existes in DB
@@ -77,7 +82,7 @@ public class Logic {
         heatmap.generate();
         BufferedImage image = heatmap.toBufferedImage();
         
-        while(!FileSystem.saveImage("./../public_html/images/" + imagePath + ".png", image))
+        while(!FileSystem.saveImage("~/public_html/images/" + imagePath + ".png", image))
             imagePath = MD5.crypt(imagePath);
         
         // update database
