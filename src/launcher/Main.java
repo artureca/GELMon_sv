@@ -42,7 +42,7 @@ public class Main {
         // TODO code application logic here
           
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
-        //FileSystem.displayCurrentConfig();
+        FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
         
@@ -52,7 +52,7 @@ public class Main {
         Timestamp iniciots = Timestamp.valueOf("2016-03-01 00:00:00");
         Timestamp finalts = Timestamp.valueOf("2016-03-01 23:59:59");
         Timestamp step = Timestamp.valueOf("2016-03-01 23:59:59");
-        System.out.println(Logic.getNumberOfLocationsByInterval(iniciots, finalts, 60));   
+        System.out.println(Logic.getNumberOfLocationsByInterval(iniciots, finalts, 360000000));   
         System.out.println("-----------------------");
         
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
