@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * Represents an image transformed in a matrix of pixels
+ * @author Eugénio Carvalhido
  * @author Raquel Ribeiro
  * @author Vânia Vieira
  */
@@ -31,6 +32,7 @@ public class Image {
     
     /**
      * Creates a matrix of pixels
+     * @author Eugénio Carvalhido
      * @author Raquel Ribeiro
      * @author Vânia Vieira
      * @param width represents the widht of a matrix
@@ -71,6 +73,7 @@ public class Image {
 
     /**
      * Fill the pixel matrix with the population values.
+     * @author Eugénio Carvalhido
      * @author Raquel Ribeiro
      * @author Vânia Vieira
      * @param pop represents the value of population in a certain coordinate

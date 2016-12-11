@@ -21,6 +21,7 @@ package analysis.dsp;
  * Represents a pixel in ARGB mode.
  * 
  * @author Artur Antunes
+ * @author Eugénio Carvalhido
  * @author Raquel Ribeiro
  * @author Vânia Vieira
  */
