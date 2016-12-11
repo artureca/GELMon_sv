@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 /**
  *
- * @Artur Antunes
- * @author Raquel Ribeiro
+ * @author Artur Antunes
  * @author Eugénio Carvalhido
+ * @author Raquel Ribeiro
  */
 public class Video { 
     private ArrayList<Heatmap> images;
