@@ -164,7 +164,7 @@ public class Logic {
       */
         
         Locations loc = new Locations();
-        all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
+        //all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
@@ -208,7 +208,7 @@ public class Logic {
     
         
         Locations loc = new Locations();
-        all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
+        //all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
@@ -255,7 +255,7 @@ public class Logic {
         Locations loc = new Locations();
         
         
-        all = loc.getTimeLocation(init, fin);    //Busca a DB
+        //all = loc.getTimeLocation(init, fin);    //Busca a DB
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long

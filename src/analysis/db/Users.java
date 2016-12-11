@@ -13,18 +13,13 @@ import java.sql.ResultSet;
  *
  * @author Bruno
  */
-public class Users {
-
-    public Users() {
-    }
-    
+public class Users extends MySQL{
             
     PreparedStatement st1;
     ResultSet rs;
     
     
-    public boolean vfLogin(Connection con,String email){
-        
+    public boolean vfLogin(String name, String email, String sessionid){      
              
         try{
             String query= "SELECT * FROM users WHERE email = ?";
@@ -50,10 +45,5 @@ public class Users {
         }
         
      return true;   
-    }
-    
-    
-    
-    
-    
+    }    
 }

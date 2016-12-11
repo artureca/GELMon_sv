@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import tools.Pair;
 
 /**
  *
@@ -20,9 +21,7 @@ public class Locations extends MySQL{
     PreparedStatement st1;
     ResultSet rs;
     
-    
-    
-    public boolean setLocation(double latitude, double longitude,String tmsi,Timestamp l_time){
+    public boolean setLocation(double latitude, double longitude, String tmsi,long l_time){
         
         try{
             String query= "INSERT INTO locations (latitude,longitude,tmsi,l_time) values(?,?,?,?) ";
@@ -30,80 +29,63 @@ public class Locations extends MySQL{
             st1.setDouble(1,latitude);
             st1.setDouble(2,longitude);
             st1.setString(3,tmsi);
-            st1.setTimestamp(4,l_time);
+            st1.setTimestamp(4,new Timestamp(l_time));
             st1.executeUpdate();
          
         }catch(Exception ex){
             System.out.println("setLocation error:"+ex);
         }
         
-     return true;   
+        return true;   
     }
     
-    
-    public  ArrayList<String> getLocation(Timestamp i_time,Timestamp f_time){
+    /**
+     *  Metam a merda do javadoc para um gajo saber como trabalhar com isto!!!.
+     * @param i_time
+     * @param f_time
+     * @return Pair<Latitude,Longitude>
+     */
+    public ArrayList<Pair<Double,Double>> getLocation(long i_time,long f_time){
        
-        ArrayList<String> arrayList = new ArrayList<String>(); 
+        ArrayList<Pair<Double,Double>> arrayList = new ArrayList<>(); 
         
         try{
             String query= "SELECT latitude,longitude FROM locations WHERE l_time >= ? and l_time <= ? ";
             st1 = con.prepareStatement(query);
-            st1.setTimestamp(1,i_time);
-            st1.setTimestamp(2,f_time);
+            st1.setTimestamp(1,new Timestamp(i_time));
+            st1.setTimestamp(2,new Timestamp(f_time));
             rs=st1.executeQuery();
             
-             
+            while(rs.next())
+                arrayList.add(new Pair<>(rs.getDouble("latitude"),rs.getDouble("longitude")));
             
-            while(rs.next()){
-                
-                int i = 1;
-                while(i <= 2) {
-                    
-                    arrayList.add(rs.getString(i++));
-                    
-                }    
-                
-           // System.out.println(rs.getString("latitude"));
-           // System.out.println(rs.getString("longitude"));
-         
-
-            }
-           
-         
         }catch(Exception ex){
             System.out.println("getLocation error:"+ex);
         }
         
-     return (arrayList);   
+        return arrayList;   
     }
     
-    public  ArrayList<String> getTimeLocation(Timestamp i_time,Timestamp f_time){
+    public  ArrayList<Long> getTimeLocation(long i_time,long f_time){
        
-        ArrayList<String> arrayList = new ArrayList<String>(); 
+        ArrayList<Long> arrayList = new ArrayList<>(); 
         
         try{
             String query= "SELECT l_time FROM locations WHERE l_time >= ? and l_time <= ? ";
             st1 = con.prepareStatement(query);
-            st1.setTimestamp(1,i_time);
-            st1.setTimestamp(2,f_time);
+            st1.setTimestamp(1,new Timestamp(i_time));
+            st1.setTimestamp(2,new Timestamp(f_time));
             rs=st1.executeQuery();
             
             while(rs.next()){
-            
-                
-                    
-                    arrayList.add(rs.getString("l_time"));
-                    
-             
-
+                    arrayList.add(rs.getTimestamp("l_time").getTime()/1000);
             }
-           
          
         }catch(Exception ex){
             System.out.println("getLocation error:"+ex);
         }
         
-     return (arrayList);   
+        return arrayList;   
     }
     
     
