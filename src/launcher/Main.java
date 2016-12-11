@@ -43,14 +43,7 @@ public class Main {
         //FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
-        
-        // THIS IS COMPLETLY WRONG !!!
-//        System.out.println("DATABASE FUNCTIONS TEST");
-//        System.out.println("-----------------------");
-//        Logic log = new Logic();
-//        System.out.println(log.getNumberOfLocationsByHour());   
-//        System.out.println("-----------------------");
-        
+                
         TCP_sv<Proto_AZGO> tcp_azgo_sv = new TCP_sv<>(
                 Proto_AZGO.class,
                 Integer.decode(FileSystem.getConfig("AZGO.port")),
