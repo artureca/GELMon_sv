@@ -40,7 +40,7 @@ public class Main {
         // TODO code application logic here
           
         FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
-        //FileSystem.displayCurrentConfig();
+        FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
         

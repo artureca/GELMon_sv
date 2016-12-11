@@ -227,6 +227,13 @@ public class Logic {
         return num;
     }
     
+    /**
+     *Gets number of locations in DB between a given interval, with a precision defined by the step
+     * @param init initial date of the interval
+     * @param fin final date of the interval
+     * @param step precision of the interval
+     * @return
+     */
     public static int[] getNumberOfLocationsByInterval (Timestamp init, Timestamp fin, long step){
         
         int i, j, auxi;
@@ -234,21 +241,13 @@ public class Logic {
         long l_init=init.getTime();
         long l_fin=fin.getTime();
         //long l_step=step.getTime();
-        int vectorsize = toIntExact((l_init-l_fin)/step);
-        int[] num = new int[vectorsize]; //Array com pessoas/hora
+        int vectorsize = toIntExact((l_fin-l_init)/step);
+        System.out.println("Vector Size = "+vectorsize);
+        int[] num = new int[vectorsize]; //Array com pessoas/step
         Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
         
         
         Long inicionum = init.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(inicionum);
-        
-        /*Long finnum = (inicionum+86399)*1000;  //Data final calculado (00:00:00+23:59:59) para pesquisa(quary) na DB
-        fimts = new Timestamp(finnum);*/
-        
-        //String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
-        //fimts = Timestamp.valueOf(fin);
-        //Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(finnum);
         
         ArrayList<String> all = new ArrayList<String>(); //Inicializacao lista de timestamps(strings)
         ArrayList<Long> nmr = new ArrayList<Long>();    //Inicializacao lista de timestamps(long)
@@ -260,9 +259,11 @@ public class Logic {
         
         
         for (i=0; i<all.size(); i++){           //Converte lista de strings para long
-            System.out.println(all.get(i));
+            //System.out.println(all.get(i));
             la = Timestamp.valueOf(all.get(i));
+            System.out.println(la);
             nmr.add(la.getTime()/1000);         //Elimina 0s a mais
+            System.out.println(la.getTime()/1000);
         }
         
         
@@ -273,6 +274,10 @@ public class Logic {
             aux=aux/step;
             auxi=aux.intValue();
             num[auxi]++;
+        }
+        
+        for (i=0; i<vectorsize; i++){
+            System.out.println("Hora "+i+" = "+num[i]);
         }
         
         return num;

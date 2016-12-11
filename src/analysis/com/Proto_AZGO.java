@@ -20,6 +20,8 @@ package analysis.com;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import analysis.db.Users;
+import analysis.bl.Logic;
 
 
 /**
@@ -42,9 +44,9 @@ public class Proto_AZGO extends Protocol {
 
     @Override
     public String decode(String received){
-        String[] tokens = received.split("@");
+        String[] tokens = received.split("$");
         switch (tokens[0]){
-            case "Login": return handlerLogin(tokens);
+            case "Login": return handlerLogin(tokens); //Login$email$session_id
             //case "Logout": return handlerLogout(tokens);
             default: return received.concat("_OK");
         }
@@ -52,7 +54,12 @@ public class Proto_AZGO extends Protocol {
     
     private String handlerLogin(String[] tokens){
         
-        return "ok";
+        String email = new String(tokens[1]);
+        String name = new String(tokens[2]);
+        
+        String cenas = new Integer(Logic.loginUser(email, name));        
+        
+        
+        return "Login".concat("$").concat(cenas) ;
     }
-
 }
