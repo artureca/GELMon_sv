@@ -46,6 +46,7 @@ public class Proto_PHP extends Protocol {
         String[] tokens = received.split("@");
         switch (tokens[0]){
             case "heatmap": return handlerHeatmap(tokens);
+            case "graph": return handlerGraph(tokens);
             //case "video": return handlerVideo(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return "UNKNOWN REQUEST";
@@ -58,6 +59,12 @@ public class Proto_PHP extends Protocol {
         // no more Strings from this point forward, unless no other option
         return Logic.getHeatmap(Long.decode(tokens[1]), Long.decode(tokens[2]));
     }
-
+    
+    private String handlerGraph(String[] tokens) {
+        // no need to complicate stuff
+        // the logic must be passed with the correct format!!!
+        // no more Strings from this point forward, unless no other option
+        return Logic.getNumberOfLocationsByInterval(Long.decode(tokens[1]), Long.decode(tokens[2]), Long.decode(tokens[3]));
+    }
 
 }

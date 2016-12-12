@@ -70,12 +70,13 @@ public class Logic {
         Double[][] values = new Double
             [Heatmap.getBackground().getWidth()]
             [Heatmap.getBackground().getHeight()];
+        Double max = 0.0;
         
         for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
             for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
                 values[i][j] = 0.0;
         
-        points.forEach((point) -> {
+        for (Pair<Double,Double> point : points){
             Pair<Double,Double> tmp = new Pair<>(point);
             point.setK(TMATRIX[0][0]*tmp.getK() + TMATRIX[0][1]*tmp.getV());
             point.setV(TMATRIX[1][0]*tmp.getK() + TMATRIX[1][1]*tmp.getV());
@@ -86,13 +87,21 @@ public class Logic {
                 point.setV(0.0);
             if (point.getK() > Heatmap.getBackground().getWidth() - 1) 
                 point.setK(Heatmap.getBackground().getWidth()-1.0);
-            if (point.getK() > Heatmap.getBackground().getWidth() - 1) 
-                point.setK(Heatmap.getBackground().getWidth()-1.0);
+            if (point.getV() > Heatmap.getBackground().getHeight() - 1) 
+                point.setV(Heatmap.getBackground().getHeight()-1.0);
+                        
+            if (max < values[point.getK().intValue()][point.getV().intValue()]++)
+               max = values[point.getK().intValue()][point.getV().intValue()];
             
-            values[point.getK().intValue()][point.getV().intValue()] += 1/points.size();
-        });
+            System.out.println("old: " + tmp.toString() + " | new: " + point.toString());
+        }
+        
+        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
+            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
+                values[i][j] /= max;
                 
-        Heatmap heatmap = new Heatmap(values);
+        Heatmap heatmap = new Heatmap(Smooth(values,Heatmap.getBackground().getWidth(),Heatmap.getBackground().getHeight()));
+        //Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
     }
@@ -201,11 +210,17 @@ public class Logic {
         p2 = points[1].split(",");
         from2 = new Pair(Double.valueOf(p1[0]),Double.valueOf(p1[1]));
         to2 = new Pair(Double.valueOf(p2[0]),Double.valueOf(p2[1]));
+                
+        TMATRIX[1][1] = (from1.getK()*to2.getV() - to1.getV()*from2.getK())/(from1.getK()*from2.getV() - from1.getV()*from2.getK());
+        TMATRIX[0][1] = (from1.getK()*to2.getK() - to1.getK()*from2.getK())/(from1.getK()*from2.getV() - from1.getV()*from2.getK());
+        TMATRIX[1][0] = (to1.getV() - TMATRIX[1][1]*from1.getV())/from1.getK();
+        TMATRIX[0][0] = (to1.getK() - TMATRIX[0][1]*from1.getV())/from1.getK();
         
-        TMATRIX[1][1] = (from1.getK()*to2.getV() - to2.getK()*from1.getV())/(from1.getK()*from2.getV() - from2.getK()*from1.getV());
-        TMATRIX[0][1] = (from1.getK()*to1.getV() - to1.getK()*from1.getV())/(from1.getK()*from2.getV() - from2.getK()*from1.getV());
-        TMATRIX[1][0] = (to2.getK() - TMATRIX[1][1]*from2.getK())/from1.getK();
-        TMATRIX[0][0] = (to1.getK() - TMATRIX[0][1]*from2.getK())/from1.getK();
+        System.out.println();
+        System.out.println(from1.toString() + ">" + to1.toString());
+        System.out.println(from2.toString() + ">" + to2.toString());
+        System.out.println(TMATRIX[0][0] + "\t | \t" + TMATRIX[0][1]);
+        System.out.println(TMATRIX[1][0] + "\t | \t" + TMATRIX[1][1]);
         
         Heatmap.setup();
         MySQL.setup();
@@ -321,7 +336,7 @@ public class Logic {
     public static String getNumberOfLocationsByInterval (Long init, Long fin, Long step){
         
         String fileName = MD5.crypt(init.toString() + fin.toString() + step.toString()) + ".dat";
-        String filePath = System.getenv("$HOME") + "/public_html/" + graphFolder + "/" + fileName ;
+        String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName ;
         String fileURL = url + "/" + graphFolder + "/" + fileName ;
         
         // should work, not sure. Comment if problems arise! ///////////////////
@@ -331,7 +346,11 @@ public class Logic {
         
         Long aux = ((fin-init)/step);
         Integer[] num = new Integer[aux.intValue()];
-        ArrayList<Long> nmr = new Locations().getTimeLocationAsLong(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
+        
+        for (int i = 0; i < aux.intValue(); i++)
+            num[i] = 0;
+        
+        ArrayList<Long> nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
         ArrayList<String> ret = new ArrayList<>();
         
         for (Long time : nmr){
@@ -355,6 +374,11 @@ public class Logic {
             LOCK.notifyAll();
         }
         ////////////////////////////////////////////////////////////////////////
+//        (41.177628,-8.597396)>(182.0,351.0)
+//        (41.178021,-8.864874)>(844.0,205.0)
+//        1459.2030922137008       |      -1454.7693321062093
+//        1446.1753940042763       |      -1425.6652207026052
+
         
         return fileURL;
     }

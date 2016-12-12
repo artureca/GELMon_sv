@@ -52,8 +52,8 @@ public class Locations extends MySQL{
         try{
             String query= "SELECT latitude,longitude FROM locations WHERE l_time >= ? and l_time <= ? ";
             st1 = con.prepareStatement(query);
-            st1.setTimestamp(1,new Timestamp(i_time));
-            st1.setTimestamp(2,new Timestamp(f_time));
+            st1.setLong(1,i_time);
+            st1.setLong(2,f_time);
             rs=st1.executeQuery();
             
             while(rs.next())
@@ -66,29 +66,8 @@ public class Locations extends MySQL{
         return arrayList;   
     }
     
+
     public  ArrayList<Long> getTimeLocation(long i_time,long f_time){
-       
-        ArrayList<Long> arrayList = new ArrayList<>(); 
-        
-        try{
-            String query= "SELECT l_time FROM locations WHERE l_time >= ? and l_time <= ? ";
-            st1 = con.prepareStatement(query);
-            st1.setTimestamp(1,new Timestamp(i_time));
-            st1.setTimestamp(2,new Timestamp(f_time));
-            rs=st1.executeQuery();
-            
-            while(rs.next()){
-                    arrayList.add(rs.getTimestamp("l_time").getTime()/1000);
-            }
-         
-        }catch(Exception ex){
-            System.out.println("getLocation error:"+ex);
-        }
-        
-        return arrayList;   
-    }
-    
-        public  ArrayList<Long> getTimeLocationAsLong(long i_time,long f_time){
        
         ArrayList<Long> arrayList = new ArrayList<>();
         int i=0; //for testing
