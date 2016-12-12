@@ -331,13 +331,17 @@ public class Logic {
         
         Long aux = ((fin-init)/step);
         Integer[] num = new Integer[aux.intValue()];
-        ArrayList<Long> nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
+        ArrayList<Long> nmr = new Locations().getTimeLocationAsLong(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
         ArrayList<String> ret = new ArrayList<>();
         
         for (Long time : nmr){
             aux = (time - init) / step;
+            System.out.println("aux.intValue() = "+aux.intValue());
             num[aux.intValue()]++;
+            System.out.println("num["+aux.intValue()+"] = "+num[aux.intValue()]);
         }
+        
+        System.out.println("Fim do primeiro ciclo for");
         
         for (Integer i : num)
             ret.add(i.toString());
