@@ -48,7 +48,7 @@ public class Proto_PHP extends Protocol {
             case "heatmap": return handlerHeatmap(tokens);
             //case "video": return handlerVideo(tokens);
             //case "Logout": return handlerLogout(tokens);
-            default: return null;
+            default: return "UNKNOWN REQUEST";
         }
     }
     

@@ -20,8 +20,6 @@ package analysis.com;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-import analysis.db.Users;
-import analysis.bl.Logic;
 
 
 /**
@@ -57,7 +55,7 @@ public class Proto_AZGO extends Protocol {
         String email = new String(tokens[1]);
         String name = new String(tokens[2]);
         
-        String cenas = new Integer(Logic.loginUser(email, name));        
+        String cenas = "";//new Integer(Logic.loginUser(email, name));        
         
         
         return "Login".concat("$").concat(cenas) ;

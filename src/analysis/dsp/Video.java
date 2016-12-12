@@ -24,9 +24,11 @@ public class Video {
     
     public Boolean getHeatmaps(){
         for (long t=d; t<d+84600;t=t+600){ 
-        } 
+        }
+        return false;
     }
     
     private Heatmap getHeatmap(long i,long f){
+        return null;
     }
 }
