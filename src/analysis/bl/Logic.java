@@ -23,8 +23,10 @@ import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.HashMap;
 import tools.FileSystem;
 import tools.Pair;
+import java.util.Random;
 
 
 /**
@@ -43,6 +45,7 @@ public class Logic {
     private static final Double[][] TMATRIX= new Double[2][2];
     
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
+    static HashMap<String, User> loggedin = new HashMap<String, User>();
     private static final Object LOCK = new Object();
     
     private static Boolean checkFile(String fileName,String filePath){
@@ -382,5 +385,21 @@ public class Logic {
         
         return fileURL;
     }
+
+
+    public String loginUser(String name, String email){
+
+        Random sessionid = new Random();
+        
+        Integer inte = sessionid.nextInt();
+        
+        String ret= MD5.crypt(inte.toString());
+        
+        Users cenas = new Users();
+        cenas.vfLogin(name, email, ret);
+
+        return ret;
+    }
+
     
 }
