@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListSet;
 import tools.FileSystem;
+import tools.Pair;
 
 
 /**
@@ -37,11 +38,60 @@ public class Logic {
     
     private static String imgFolder;
     private static String graphFolder;
-//    private static String vidFolder;
+    private static String vidFolder;
     private static String url;
+    private static final Double[][] TMATRIX= new Double[2][2];
     
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
     private static final Object LOCK = new Object();
+    
+    private static Boolean checkFile(String fileName,String filePath){
+        synchronized(LOCK){
+            while (true){
+                if (FileSystem.fileExists(filePath)) 
+                    return true;
+                
+                if (PROCESSING.contains(fileName)) {
+                    try {
+                        LOCK.wait();
+                    } catch (InterruptedException ex) {}
+                }else{
+                    PROCESSING.add(fileName);
+                    return false;
+                }
+            }
+        }
+    }
+    
+    private static Heatmap generateHeatmap(Long date1, Long date2){
+        
+        ArrayList<Pair<Double,Double>> points = new Locations().getLocation(date1, date2);
+        
+        Double[][] values = new Double
+            [Heatmap.getBackground().getWidth()]
+            [Heatmap.getBackground().getHeight()];
+        
+        points.forEach((point) -> {
+            Pair<Double,Double> tmp = new Pair<>(point);
+            point.setK(TMATRIX[0][0]*tmp.getK() + TMATRIX[0][1]*tmp.getV());
+            point.setV(TMATRIX[1][0]*tmp.getK() + TMATRIX[1][1]*tmp.getV());
+            
+            if (point.getK() < 0) 
+                point.setK(0.0);
+            if (point.getV() < 0) 
+                point.setV(0.0);
+            if (point.getK() > Heatmap.getBackground().getWidth() - 1) 
+                point.setK(Heatmap.getBackground().getWidth()-1.0);
+            if (point.getK() > Heatmap.getBackground().getWidth() - 1) 
+                point.setK(Heatmap.getBackground().getWidth()-1.0);
+            
+            values[point.getK().intValue()][point.getV().intValue()] += 1/points.size();
+        });
+        
+        Heatmap heatmap = new Heatmap(values);
+        heatmap.generate();
+        return heatmap;
+    }
     
     /**
      * Gets the reqeusted heatmap path, creating it if it doesn't exist.
@@ -57,7 +107,7 @@ public class Logic {
         String filePath = System.getenv("$HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
         String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
         
-        if (FileSystem.fileExists(filePath)) 
+        if (checkFile(fileName,filePath)) 
             return fileURL;
         
         // wait if being processed
@@ -65,26 +115,18 @@ public class Logic {
         if (null == Heatmap.getBackground())
             return "ERROR : heatmap background null!!!";
         
-        Double[][] values = new Double
-            [Heatmap.getBackground().getWidth()]
-            [Heatmap.getBackground().getHeight()];
-        
-        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
-            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
-                values[i][j] = (i + j) * 1.0/(Heatmap.getBackground().getWidth()+Heatmap.getBackground().getHeight());
-        
-        
-        // Somehow get the values from the database
-        // Convert them from coordenates
-        
-        Heatmap heatmap = new Heatmap(values);
-        heatmap.generate();
+        Heatmap heatmap = generateHeatmap(date1, date2);
         BufferedImage image = heatmap.toBufferedImage();
         
-        FileSystem.saveImage(filePath, image);
+        //FileSystem.saveImage(filePath, image);
         
-        // update database
-        // wake up waiting threads
+        // should work, not sure. Comment if problems arise! ///////////////////
+        synchronized(LOCK){
+            FileSystem.saveImage(filePath, image);
+            PROCESSING.remove(fileName);
+            LOCK.notifyAll();
+        }
+        ////////////////////////////////////////////////////////////////////////
         
         return fileURL;
     }
@@ -127,6 +169,40 @@ public class Logic {
     }
     
     public static void setup() {
+        imgFolder = FileSystem.getConfig("LOGIC.imgdir");
+        graphFolder = FileSystem.getConfig("LOGIC.graphdir");
+        vidFolder = FileSystem.getConfig("LOGIC.videodir");
+        url = FileSystem.getConfig("LOGIC.url");
+        
+        Pair<Double,Double> from1, from2;
+        Pair<Double,Double> to1, to2;
+        
+        String point;
+        String [] points, p1, p2;
+        
+        point = FileSystem.getConfig("LOGIC.matrix.point1");
+        point = point.replace('(', ' ');
+        point = point.replace(')', ' ');
+        points = point.split(">");
+        p1 = points[0].split(",");
+        p2 = points[1].split(",");
+        from1 = new Pair(Double.valueOf(p1[0]),Double.valueOf(p1[1]));
+        to1 = new Pair(Double.valueOf(p2[0]),Double.valueOf(p2[1]));
+        
+        point = FileSystem.getConfig("LOGIC.matrix.point2");
+        point = point.replace('(', ' ');
+        point = point.replace(')', ' ');
+        points = point.split(">");
+        p1 = points[0].split(",");
+        p2 = points[1].split(",");
+        from2 = new Pair(Double.valueOf(p1[0]),Double.valueOf(p1[1]));
+        to2 = new Pair(Double.valueOf(p2[0]),Double.valueOf(p2[1]));
+        
+        TMATRIX[1][1] = (from1.getK()*to2.getV() - to2.getK()*from1.getV())/(from1.getK()*from2.getV() - from2.getK()*from1.getV());
+        TMATRIX[0][1] = (from1.getK()*to1.getV() - to1.getK()*from1.getV())/(from1.getK()*from2.getV() - from2.getK()*from1.getV());
+        TMATRIX[1][0] = (to2.getK() - TMATRIX[1][1]*from2.getK())/from1.getK();
+        TMATRIX[0][0] = (to1.getK() - TMATRIX[0][1]*from2.getK())/from1.getK();
+        
         Heatmap.setup();
         MySQL.setup();
     }
@@ -245,21 +321,8 @@ public class Logic {
         String fileURL = url + "/" + graphFolder + "/" + fileName ;
         
         // should work, not sure. Comment if problems arise! ///////////////////
-        synchronized(LOCK){
-            while (true){
-                if (FileSystem.fileExists(filePath)) 
-                    return fileURL;
-                
-                if (PROCESSING.contains(fileName)) {
-                    try {
-                        LOCK.wait();
-                    } catch (InterruptedException ex) {}
-                }else{
-                    PROCESSING.add(fileName);
-                    break;
-                }
-            }
-        }
+        if (checkFile(fileName,filePath)) 
+            return fileURL;
         ////////////////////////////////////////////////////////////////////////
         
         Long aux = ((fin-init)/step);
@@ -275,14 +338,16 @@ public class Logic {
         for (Integer i : num)
             ret.add(i.toString());
         
-        FileSystem.saveText(filePath, ret);
+        //FileSystem.saveText(filePath, ret);
         
         // should work, not sure. Comment if problems arise! ///////////////////
         synchronized(LOCK){
+            FileSystem.saveText(filePath, ret);
             PROCESSING.remove(fileName);
             LOCK.notifyAll();
         }
         ////////////////////////////////////////////////////////////////////////
+        
         return fileURL;
     }
     

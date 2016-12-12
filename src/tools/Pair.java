@@ -19,6 +19,11 @@ public class Pair<K,V> {
         this.k = k;
         this.v = v;
     }
+    
+    public Pair(Pair<K,V> a){
+        this.k = a.k;
+        this.v = a.v;
+    }
 
     public K getK() {
         return k;
@@ -36,5 +41,9 @@ public class Pair<K,V> {
         this.v = v;
     }
     
+    @Override
+    public String toString(){
+        return "("+this.getK().toString()+","+this.getV().toString()+")";
+    }
     
 }
