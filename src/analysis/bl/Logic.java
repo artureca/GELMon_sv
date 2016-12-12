@@ -71,6 +71,10 @@ public class Logic {
             [Heatmap.getBackground().getWidth()]
             [Heatmap.getBackground().getHeight()];
         
+        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
+            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
+                values[i][j] = 0.0;
+        
         points.forEach((point) -> {
             Pair<Double,Double> tmp = new Pair<>(point);
             point.setK(TMATRIX[0][0]*tmp.getK() + TMATRIX[0][1]*tmp.getV());
@@ -87,7 +91,7 @@ public class Logic {
             
             values[point.getK().intValue()][point.getV().intValue()] += 1/points.size();
         });
-        
+                
         Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
@@ -104,7 +108,7 @@ public class Logic {
     public static String getHeatmap(Long date1, Long date2){
         
         String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
-        String filePath = System.getenv("$HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
+        String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
         String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
         
         if (checkFile(fileName,filePath)) 

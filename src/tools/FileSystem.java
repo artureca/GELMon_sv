@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,12 +30,11 @@ public class FileSystem {
     
     public static Boolean fileExists(String path){
         File f = new File(path);
-        if(f.exists() && !f.isDirectory())
-            return true;
-        return false;
+        return f.exists() && !f.isDirectory();
     }
     
     public static void loadDefaultConfig(){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading default configuration");
         BufferedReader txtReader = new BufferedReader(new InputStreamReader(FileSystem.class.getResourceAsStream("default.conf")));
         try {
             while(true){
@@ -42,6 +42,8 @@ public class FileSystem {
                 if (null == line)
                     break;
                 String[] tokens = line.split("=");
+                if(tokens[0].charAt(0) == '#')
+                    continue;
                 CONFIG.put(tokens[0], tokens[1]);
             }
         } catch (IOException ex) {
@@ -50,6 +52,7 @@ public class FileSystem {
     }
     
     public static BufferedImage loadImage(String path){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading file: " + path);
         BufferedImage img;
         try {
             img = ImageIO.read(new File(path));
@@ -61,6 +64,8 @@ public class FileSystem {
     }
     
     public static Boolean saveImage(String path, BufferedImage img){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Saving file: " + path);
+                    
         Boolean flag;
         try {
             File imgFile = new File(path);
@@ -76,6 +81,7 @@ public class FileSystem {
     }
     
     public static ArrayList<String> loadText(String path){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading file: " + path);
         ArrayList<String> text = new ArrayList<>();
         try {
             for (Iterator<String> it = Files.readAllLines(Paths.get(path)).iterator(); it.hasNext();)
@@ -87,6 +93,7 @@ public class FileSystem {
     }
     
     public static Boolean saveText(String path, ArrayList<String> data){
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Saving file: " + path);
         Boolean flag;
         try {
             Files.write(Paths.get(path), data, StandardCharsets.UTF_8);
@@ -100,14 +107,18 @@ public class FileSystem {
     
     public static void loadConfig(String path){
         CONFIG.clear();
+        loadDefaultConfig();
+        
         ArrayList<String> text = loadText(path);
-        if (text.isEmpty()){
-            loadDefaultConfig();
+        if (text.isEmpty())
             return;
-        }
+        
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading configuration file");
+        
         text.forEach((line) -> {
             String[] tokens = line.split("=");
-            CONFIG.put(tokens[0], tokens[1]);
+            if(tokens[0].charAt(0) != '#')
+                CONFIG.put(tokens[0], tokens[1]);
         });
     }
     
@@ -116,7 +127,7 @@ public class FileSystem {
             loadDefaultConfig();
         
         if (!CONFIG.containsKey(key)) 
-            System.err.println("Loading null config from key: " + key);
+            System.err.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading null config from key: " + key);
             
         return CONFIG.get(key);
     }

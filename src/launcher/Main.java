@@ -39,8 +39,8 @@ public class Main {
     public static void main(String[] args){
         // TODO code application logic here
           
-        FileSystem.loadConfig("~/.config/gelmon/gelmon_sv.conf");
-        FileSystem.displayCurrentConfig();
+        FileSystem.loadConfig(System.getenv("HOME") + "/.config/gelmon/gelmon_sv.conf");
+        //FileSystem.displayCurrentConfig();
         
         analysis.bl.Logic.setup();
         
