@@ -43,6 +43,7 @@ public class Logic {
     private static String vidFolder;
     private static String url;
     private static final Double[][] TMATRIX= new Double[2][2];
+    private ArrayList<Heatmap> images;
     
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
     static HashMap<String, User> loggedin = new HashMap<String, User>();
@@ -147,6 +148,25 @@ public class Logic {
         return fileURL;
     }
     
+    public Boolean getHeatmaps(Long d){
+         
+        return false;
+    }
+    private static void generateVideo(ArrayList<Heatmap> images, Long d){
+        Heatmap img[] = null;
+        int i=0;
+        
+        String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+        String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
+        String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
+        
+        for (long t=d; t<d+84600;t=t+600){ 
+            img[i] = generateHeatmap(t,t+1740);
+            i++;
+        }
+        
+        
+        }
     private static Double[][] Smooth(Double[][] data,Integer w, Integer h){
         double[][] matriz= {
             {1,2,3,2,1},
