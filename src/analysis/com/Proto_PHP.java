@@ -47,6 +47,7 @@ public class Proto_PHP extends Protocol {
         switch (tokens[0]){
             case "heatmap": return handlerHeatmap(tokens);
             case "graph": return handlerGraph(tokens);
+            case "matrix": return handlerDebugMatrix(tokens);
             //case "video": return handlerVideo(tokens);
             //case "Logout": return handlerLogout(tokens);
             default: return "UNKNOWN REQUEST";
@@ -65,6 +66,13 @@ public class Proto_PHP extends Protocol {
         // the logic must be passed with the correct format!!!
         // no more Strings from this point forward, unless no other option
         return Logic.getNumberOfLocationsByInterval(Long.decode(tokens[1]), Long.decode(tokens[2]), Long.decode(tokens[3]));
+    }
+    
+    private String handlerDebugMatrix(String[] tokens) {
+        // no need to complicate stuff
+        // the logic must be passed with the correct format!!!
+        // no more Strings from this point forward, unless no other option
+        return Logic.debugMatrix(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
     }
 
 }

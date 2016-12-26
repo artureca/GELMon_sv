@@ -67,6 +67,24 @@ public class Logic {
         }
     }
     
+    public static String debugMatrix (Double k, Double v){
+        Pair<Double,Double> tmp = new Pair<>(k,v);
+        Pair<Double,Double> point = new Pair<>(0.0, 0.0);
+        point.setK(TMATRIX[0][0]*tmp.getK() + TMATRIX[0][1]*tmp.getV());
+        point.setV(TMATRIX[1][0]*tmp.getK() + TMATRIX[1][1]*tmp.getV());
+
+        if (point.getK() < 0) 
+            point.setK(0.0);
+        if (point.getV() < 0) 
+            point.setV(0.0);
+        if (point.getK() > Heatmap.getBackground().getWidth() - 1) 
+            point.setK(Heatmap.getBackground().getWidth()-1.0);
+        if (point.getV() > Heatmap.getBackground().getHeight() - 1) 
+            point.setV(Heatmap.getBackground().getHeight()-1.0);
+        
+        return point.toString();
+    }
+    
     private static Heatmap generateHeatmap(Long date1, Long date2){
         
         ArrayList<Pair<Double,Double>> points = new Locations().getLocation(date1, date2);
