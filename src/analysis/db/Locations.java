@@ -7,7 +7,6 @@ package analysis.db;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import tools.Pair;
 
@@ -31,7 +30,7 @@ public class Locations extends MySQL{
             st1.setDouble(1,latitude);
             st1.setDouble(2,longitude);
             st1.setString(3,tmsi);
-            st1.setTimestamp(4,new Timestamp(l_time));
+            st1.setLong(4,l_time);
             st1.executeUpdate();
          
         }catch(Exception ex){

@@ -43,7 +43,8 @@ public class Proto_AZGO extends Protocol {
 
     @Override
     public String decode(String received){
-        String[] tokens = received.split("$");
+        String[] tokens = received.split("\\$");
+        System.out.println("Received from AZGO: " + tokens[0]);
         switch (tokens[0]){
             case "Login": return handlerLogin(tokens); //Login$email$session_id
             //case "Logout": return handlerLogout(tokens);
@@ -66,8 +67,8 @@ public class Proto_AZGO extends Protocol {
     private String handlerCoordinates(String[] tokens){
         
         String user = tokens[1];
-        long lat = Long.decode(tokens[2]);
-        long longi = Long.decode(tokens[3]);        
+        Double lat = Double.parseDouble(tokens[2]);
+        Double longi = Double.parseDouble(tokens[3]);        
         
         Logic.addLocation(lat, longi);
         
