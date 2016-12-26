@@ -87,6 +87,8 @@ public class Logic {
     
     private static Heatmap generateHeatmap(Long date1, Long date2){
         
+        System.out.println("Generating heatmap");
+        
         ArrayList<Pair<Double,Double>> points = new Locations().getLocation(date1, date2);
         
         Double[][] values = new Double
@@ -115,7 +117,6 @@ public class Logic {
             if (max < values[point.getK().intValue()][point.getV().intValue()]++)
                max = values[point.getK().intValue()][point.getV().intValue()];
             
-            System.out.println("old: " + tmp.toString() + " | new: " + point.toString());
         }
         if (max != 0)
             for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
@@ -203,6 +204,8 @@ public class Logic {
         
         Double[][] res= new Double[w][h];
 
+        System.out.println("Smothing heatmap");
+        
         for (int i=0;i<w;i++){
             for (int j=0;j<h;j++){ 
                 res[i][j]=0.0;
@@ -214,6 +217,8 @@ public class Logic {
                     max = res[i][j];
             }
         }
+        
+        System.out.println("Normalizing heatmap");
         
         for (int i=0;i<w;i++){
             for (int j=0;j<h;j++){ 
