@@ -67,11 +67,11 @@ public class Proto_PHP extends Protocol {
         // no need to complicate stuff
         // the logic must be passed with the correct format!!!
         // no more Strings from this point forward, unless no other option
-        ArrayList<Pair<Double,Double>> points = new Locations().getLocation(Long.decode(tokens[1]), Long.decode(tokens[2]));
+        /*ArrayList<Pair<Double,Double>> points = new Locations().getLocation(Long.decode(tokens[1]), Long.decode(tokens[2]));
         
         points.stream().forEach((point) -> {
             System.out.println(Logic.getsBuilding(point.getK(),point.getV()));
-        });
+        });*/
        
         
         return Logic.getNumberOfLocationsByInterval(Long.decode(tokens[1]), Long.decode(tokens[2]), Long.decode(tokens[3]));

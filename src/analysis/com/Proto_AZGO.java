@@ -17,6 +17,7 @@
 
 package analysis.com;
 
+import analysis.bl.Logic;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -46,6 +47,7 @@ public class Proto_AZGO extends Protocol {
         switch (tokens[0]){
             case "Login": return handlerLogin(tokens); //Login$email$session_id
             //case "Logout": return handlerLogout(tokens);
+            case "Coordinates": return handlerCoordinates(tokens); 
             default: return received.concat("_OK");
         }
     }
@@ -59,5 +61,16 @@ public class Proto_AZGO extends Protocol {
         
         
         return "Login".concat("$").concat(cenas) ;
+    }
+    
+    private String handlerCoordinates(String[] tokens){
+        
+        String user = tokens[1];
+        long lat = Long.decode(tokens[2]);
+        long longi = Long.decode(tokens[3]);        
+        
+        Logic.addLocation(lat, longi);
+        
+        return "Coordinates".concat("$").concat("OK") ;
     }
 }

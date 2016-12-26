@@ -480,6 +480,12 @@ public class Logic {
         } else return "Other";
         
     }
+    
+    public static void addLocation(double latitude, double longitude){
+        
+        new Locations().setLocation(latitude, longitude, "0", System.currentTimeMillis());
+        
+    }
 
     
 }
