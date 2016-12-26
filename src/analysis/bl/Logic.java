@@ -95,13 +95,13 @@ public class Logic {
             
             System.out.println("old: " + tmp.toString() + " | new: " + point.toString());
         }
-        
-        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
-            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
-                values[i][j] /= max;
+        if (max != 0)
+            for (int i = 0; i < Heatmap.getBackground().getWidth(); i++)
+                for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
+                    values[i][j] /= max;
                 
-        Heatmap heatmap = new Heatmap(Smooth(values,Heatmap.getBackground().getWidth(),Heatmap.getBackground().getHeight()));
-        //Heatmap heatmap = new Heatmap(values);
+        //Heatmap heatmap = new Heatmap(Smooth(values,Heatmap.getBackground().getWidth(),Heatmap.getBackground().getHeight()));
+        Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
     }
