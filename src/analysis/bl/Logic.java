@@ -122,8 +122,8 @@ public class Logic {
                 for (int j = 0; j < Heatmap.getBackground().getHeight(); j++)
                     values[i][j] /= max;
                 
-        //Heatmap heatmap = new Heatmap(Smooth(values,Heatmap.getBackground().getWidth(),Heatmap.getBackground().getHeight()));
-        Heatmap heatmap = new Heatmap(values);
+        Heatmap heatmap = new Heatmap(Smooth(values,Heatmap.getBackground().getWidth(),Heatmap.getBackground().getHeight()));
+        //Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
     }
@@ -187,25 +187,40 @@ public class Logic {
         }
     private static Double[][] Smooth(Double[][] data,Integer w, Integer h){
         double[][] matriz= {
-            {1,2,3,2,1},
-            {2,3,4,3,2},
-            {3,4,5,4,3},
-            {2,3,4,3,2},
-            {1,2,3,2,1}
+            {0,0,0,0,1,0,0,0,0},
+            {0,0,1,1,2,1,1,0,0},
+            {0,1,1,2,3,2,1,1,0},
+            {0,1,2,3,4,3,2,1,0},
+            {1,2,3,4,5,4,3,2,1},
+            {0,1,2,3,4,3,2,1,0},
+            {0,1,1,2,3,2,1,1,0},
+            {0,0,1,1,2,1,1,0,0},
+            {0,0,0,0,1,0,0,0,0}
         };
-        double total = 73;
+        //double total = 73; //73;
     
+        Double max = 0.0;
+        
         Double[][] res= new Double[w][h];
 
         for (int i=0;i<w;i++){
             for (int j=0;j<h;j++){ 
                 res[i][j]=0.0;
-                for (int t=0;t<5;t++)
-                    for (int l=0;l<5;l++)
-                      res[i][j] += getMirroredValue(data, i+t-2, j+t-2, w, h) * matriz[t][l];
-                res[i][j] /= total;
+                for (int t=0;t<9;t++)
+                    for (int l=0;l<9;l++)
+                      res[i][j] += getMirroredValue(data, i+t-4, j+l-4, w, h) * matriz[t][l];
+                //res[i][j] /= total;
+                if (max < res[i][j])
+                    max = res[i][j];
             }
         }
+        
+        for (int i=0;i<w;i++){
+            for (int j=0;j<h;j++){ 
+                res[i][j] /= max;
+            }
+        }
+        
         return res;
     }
     
