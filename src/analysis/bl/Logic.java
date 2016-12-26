@@ -445,7 +445,7 @@ public class Logic {
      * @param longitude
      * @return BlocoB, Eletro, Mecanica, Biblioteca, Info, Other
      */
-    public String getsBuilding(double latitude, double longitude){
+    public static String getsBuilding(double latitude, double longitude){
                 
         if((41.177965<latitude)&&(latitude<41.179073)&&(longitude>-8.594829)&&(longitude<-8.594320)) {
             return "Mecanica";
