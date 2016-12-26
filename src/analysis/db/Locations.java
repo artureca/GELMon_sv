@@ -21,7 +21,9 @@ public class Locations extends MySQL{
     PreparedStatement st1;
     ResultSet rs;
     
-    public boolean setLocation(double latitude, double longitude, String tmsi,long l_time){
+    public boolean setLocation(double latitude, double longitude, String tmsi, long l_time){
+        
+        System.out.println("Inserting location: "+latitude+" ,"+longitude+" @"+l_time);
         
         try{
             String query= "INSERT INTO locations (latitude,longitude,tmsi,l_time) values(?,?,?,?) ";
