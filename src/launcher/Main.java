@@ -88,9 +88,6 @@ public class Main {
             }
         }
         
-        
-        
-        
         synchronized(HOLDER) {
             while (true) {
                 try {
@@ -101,6 +98,5 @@ public class Main {
                 }
             }
         }
-        
     }
 }
