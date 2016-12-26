@@ -156,7 +156,7 @@ public class Logic {
         Heatmap img[] = null;
         int i=0;
         
-        String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+        String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
         String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
         
