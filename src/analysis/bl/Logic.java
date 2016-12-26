@@ -22,7 +22,7 @@ import analysis.dsp.Heatmap;
 import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.*;
 import java.util.HashMap;
 import tools.FileSystem;
 import tools.Pair;
@@ -42,11 +42,11 @@ public class Logic {
     private static String graphFolder;
     private static String vidFolder;
     private static String url;
-    private static final Double[][] TMATRIX= new Double[2][2];
-    private ArrayList<Heatmap> images;
     
+    private static final Double[][] TMATRIX= new Double[2][2];
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
-    static HashMap<String, User> loggedin = new HashMap<String, User>();
+    private static final HashMap<String, User> LOGGEDIN = new HashMap<String, User>();
     private static final Object LOCK = new Object();
     
     private static Boolean checkFile(String fileName,String filePath){
@@ -285,6 +285,15 @@ public class Logic {
         
         Heatmap.setup();
         MySQL.setup();
+        
+        // DELAY: 24h - horaActual + 2, executa o runDaily todos os dias as 2h
+        SCHEDULER.scheduleAtFixedRate(new Thread(){
+            @Override
+            public void run(){
+                runDaily();
+            }
+//        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
+        }, 5, 120, TimeUnit.SECONDS);
     }
     
     public static int[] getNumberOfLocationsByHour (){
@@ -482,10 +491,10 @@ public class Logic {
     }
     
     public static void addLocation(double latitude, double longitude){
-        
         new Locations().setLocation(latitude, longitude, "0", System.currentTimeMillis());
-        
     }
 
-    
+    public static void runDaily(){
+        System.out.println("Current Time: " + System.currentTimeMillis());
+    }
 }
