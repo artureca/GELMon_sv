@@ -27,8 +27,11 @@ import java.util.HashMap;
 import tools.FileSystem;
 import tools.Pair;
 import java.util.Random;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
+        
 /**
  * A class with static methods used to process the clients requests.
  * 
@@ -172,20 +175,26 @@ public class Logic {
         return false;
     }
     private static void generateVideo(ArrayList<Heatmap> images, Long d){
-        Heatmap img[] = null;
         int i=0;
-        
         String fileName = MD5.crypt(d.toString());
-        String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
-        String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
+        String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
         
         for (long t=d; t<d+84600;t=t+600){ 
-            img[i] = generateHeatmap(t,t+1740);
+            Heatmap img = generateHeatmap(t,t+1740);
+            BufferedImage image = img.toBufferedImage();
+            FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
             i++;
         }
         
-        
+        try {
+            Runtime.getRuntime().exec("ffmpeg -framerate 24 -i " + filePath + "/%d.png -c:v libx264 -vf fps=24 -pix_fmt yuv420p " + filePath +".mp4");
+            Runtime.getRuntime().exec("rm -f " + filePath + "/*");
+            Runtime.getRuntime().exec("rmdir -f " + filePath);
+        } catch (IOException ex) {
+            Logger.getLogger(Logic.class.getName()).log(Level.SEVERE, null, ex);
         }
+ }
+
     private static Double[][] Smooth(Double[][] data,Integer w, Integer h){
         double[][] matriz= {
             {0,0,0,0,1,0,0,0,0},
