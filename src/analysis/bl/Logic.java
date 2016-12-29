@@ -174,7 +174,7 @@ public class Logic {
          
         return false;
     }
-    private static void generateVideo(ArrayList<Heatmap> images, Long d){
+    private static void generateVideo(Long d){
         int i=0;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
@@ -302,7 +302,7 @@ public class Logic {
                 runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
-        }, 5, 120, TimeUnit.SECONDS);
+        }, 5, 7200, TimeUnit.SECONDS);
     }
     
     public static int[] getNumberOfLocationsByHour (){
@@ -505,5 +505,6 @@ public class Logic {
 
     public static void runDaily(){
         System.out.println("Current Time: " + System.currentTimeMillis());
+        generateVideo(System.currentTimeMillis());
     }
 }
