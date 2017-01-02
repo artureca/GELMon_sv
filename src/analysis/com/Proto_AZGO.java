@@ -40,7 +40,7 @@ public class Proto_AZGO extends Protocol {
     public Proto_AZGO(PrintWriter out, BufferedReader in) {
         super(out, in);
     }
-
+    
     @Override
     public String decode(String received){
         String[] tokens = received.split("\\$");
