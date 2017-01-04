@@ -30,8 +30,8 @@ import java.sql.Timestamp;
  * @author Artur Antunes
  */
 abstract public class Protocol extends Thread{
-    private final PrintWriter out;
-    private final BufferedReader in;
+    protected final PrintWriter out;
+    protected final BufferedReader in;
 
     /**
      * Simple constructor.
@@ -63,12 +63,14 @@ abstract public class Protocol extends Thread{
             while ((inputLine = this.in.readLine()) != null) {
                 System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Received: " + inputLine + " | From: " + this.toString());
                 outputLine = this.decode(inputLine);
-                if (outputLine == null) break;
+                if (outputLine == null) 
+                    break;
                 synchronized(this.out){
                     this.out.println(outputLine);
                 }
                 System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + outputLine + " | To: " + this.toString());
             }
+            this.kill();
             this.out.close();
             this.in.close();
 
@@ -102,5 +104,20 @@ abstract public class Protocol extends Thread{
      * @return the uplink String
      */
     abstract public String decode(String received);
+    
+    /**
+     *  Processes the downlink request and sends a response to uplink.
+     *  It has to be implemented by sub-classes.
+     * 
+     * @author Artur Antunes
+     */
+    abstract public void kill();
+    
+    protected void sentTo(String data, PrintWriter out){
+        synchronized(out){
+            out.println(data);
+        }
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + data + " | To: " + this.toString());
+    }
     
 }

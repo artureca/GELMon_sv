@@ -41,6 +41,8 @@ import java.util.logging.Logger;
 public class Logic {
     
     
+    public static final ConcurrentLinkedQueue<String> REQUESTS = new ConcurrentLinkedQueue<>();
+    
     private static String imgFolder;
     private static String graphFolder;
     private static String vidFolder;

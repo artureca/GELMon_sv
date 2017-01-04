@@ -21,6 +21,7 @@ import analysis.bl.Logic;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -30,6 +31,9 @@ import java.io.PrintWriter;
  * @author Rubens Figueiredo
  */
 public class Proto_AZGO extends Protocol {
+    
+    private static final ConcurrentHashMap<String,PrintWriter> USERS = new ConcurrentHashMap<>();
+    private String currentUser = null;
 
     /**
      * Simple Constructor. Just calls the superclass' constructor.
@@ -55,13 +59,24 @@ public class Proto_AZGO extends Protocol {
     
     private String handlerLogin(String[] tokens){
         
-        String email = new String(tokens[1]);
-        String name = new String(tokens[2]);
+        
+        String email = tokens[1];
+        String name = tokens[2];
+        
+        this.currentUser = email;
+        
+        USERS.put(this.currentUser, this.out);
+        
         
         String cenas = "";//new Integer(Logic.loginUser(email, name));        
         
         
         return "Login".concat("$").concat(cenas) ;
+    }
+    
+    private String handlerLogout(){
+        USERS.remove(this.currentUser);
+        return null ;
     }
     
     private String handlerCoordinates(String[] tokens){
@@ -73,5 +88,10 @@ public class Proto_AZGO extends Protocol {
         Logic.addLocation(lat, longi);
         
         return "Coordinates".concat("$").concat("OK") ;
+    }    
+
+    @Override
+    public void kill() {
+        handlerLogout();
     }
 }

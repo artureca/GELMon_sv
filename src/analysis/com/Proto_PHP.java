@@ -18,11 +18,9 @@
 package analysis.com;
 
 import analysis.bl.*;
-import analysis.db.Locations;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 
 /**
@@ -82,6 +80,11 @@ public class Proto_PHP extends Protocol {
         // the logic must be passed with the correct format!!!
         // no more Strings from this point forward, unless no other option
         return Logic.debugMatrix(Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]));
+    }
+
+    @Override
+    public void kill() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
