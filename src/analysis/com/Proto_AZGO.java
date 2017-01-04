@@ -34,7 +34,15 @@ public class Proto_AZGO extends Protocol {
     
     private static final ConcurrentHashMap<String,PrintWriter> USERS = new ConcurrentHashMap<>();
     private String currentUser = null;
-
+    
+    static{
+        new Thread(){
+            public void run() {
+                requestHandler();
+            }
+        }.start();
+    }
+    
     /**
      * Simple Constructor. Just calls the superclass' constructor.
      * 
@@ -48,10 +56,10 @@ public class Proto_AZGO extends Protocol {
     @Override
     public String decode(String received){
         String[] tokens = received.split("\\$");
-        System.out.println("Received from AZGO: " + tokens[0]);
+        //System.out.println("Received from AZGO: " + tokens[0]);
         switch (tokens[0]){
             case "Login": return handlerLogin(tokens); //Login$email$session_id
-            //case "Logout": return handlerLogout(tokens);
+            case "Logout": return handlerLogout();
             case "Coordinates": return handlerCoordinates(tokens); 
             default: return received.concat("_OK");
         }
@@ -59,19 +67,16 @@ public class Proto_AZGO extends Protocol {
     
     private String handlerLogin(String[] tokens){
         
-        
         String email = tokens[1];
         String name = tokens[2];
         
         this.currentUser = email;
         
         USERS.put(this.currentUser, this.out);
+              
         
         
-        String cenas = "";//new Integer(Logic.loginUser(email, name));        
-        
-        
-        return "Login".concat("$").concat(cenas) ;
+        return "Login";
     }
     
     private String handlerLogout(){
@@ -90,6 +95,24 @@ public class Proto_AZGO extends Protocol {
         return "Coordinates".concat("$").concat("OK") ;
     }    
 
+    private static void requestHandler(){
+        for(;;){
+            String request = Logic.REQUESTS.poll();
+            
+            if (request == null)
+                continue;
+            
+            String splitRequest[] = request.split("#");
+            switch (splitRequest[0]){
+                
+            }
+        }
+    }
+    
+    private static void requestMulticast(String tokens){
+        
+    }
+    
     @Override
     public void kill() {
         handlerLogout();
