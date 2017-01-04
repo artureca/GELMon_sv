@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 public class Logic {
     
     
-    public static final ConcurrentLinkedQueue<String> REQUESTS = new ConcurrentLinkedQueue<>();
     
     private static String imgFolder;
     private static String graphFolder;
@@ -53,6 +52,7 @@ public class Logic {
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
     private static final HashMap<String, User> LOGGEDIN = new HashMap<String, User>();
     private static final Object LOCK = new Object();
+    public static final ConcurrentLinkedQueue<String> REQUESTS = new ConcurrentLinkedQueue<>();
     
     private static Boolean checkFile(String fileName,String filePath){
         synchronized(LOCK){
@@ -171,11 +171,34 @@ public class Logic {
         
         return fileURL;
     }
-    
-    public Boolean getHeatmaps(Long d){
-         
-        return false;
+
+    public static void requetsMeet(String origin, String target) {
+        
+        User user = LOGGEDIN.get(target);
+        if (user == null)
+            return;
+                
+        REQUESTS.add("MeetRequest#" + target + "#" + origin);
+        
     }
+    
+    public static void requetsMeet(String target, String origin, Boolean resp) {
+        
+        User user = LOGGEDIN.get(target);
+        if (user == null)
+            return ;
+        
+        if(!resp){
+            REQUESTS.add("Meet#" + origin + "#" + target + "#FAIL");
+            return;
+        }
+        
+        Double lat = 0.0; // get target coordinates
+        Double lon = 0.0; // from the database
+        
+        REQUESTS.add("Meet#" + origin + "#" + target + "#OK#" + lat + "#" + lon);
+    }
+
     private static void generateVideo(Long d){
         int i=0;
         String fileName = MD5.crypt(d.toString());

@@ -37,6 +37,7 @@ public class Proto_AZGO extends Protocol {
     
     static{
         new Thread(){
+            @Override
             public void run() {
                 requestHandler();
             }
@@ -60,6 +61,8 @@ public class Proto_AZGO extends Protocol {
         switch (tokens[0]){
             case "Login": return handlerLogin(tokens); //Login$email$session_id
             case "Logout": return handlerLogout();
+            case "Meet" : return handlerMeet(tokens);
+            case "MeetRequest" : return handlerMeetRequest(tokens);
             case "Coordinates": return handlerCoordinates(tokens); 
             default: return received.concat("_OK");
         }
@@ -84,6 +87,16 @@ public class Proto_AZGO extends Protocol {
         return null ;
     }
     
+    private String handlerMeet(String[] tokens){
+        Logic.requetsMeet(this.currentUser, tokens[1]);
+        return " ";
+    }
+    
+    private String handlerMeetRequest(String[] tokens){
+        Logic.requetsMeet(this.currentUser, tokens[1], tokens[2].equals("OK"));
+        return " ";
+    }
+    
     private String handlerCoordinates(String[] tokens){
         
         String user = tokens[1];
@@ -104,13 +117,33 @@ public class Proto_AZGO extends Protocol {
             
             String splitRequest[] = request.split("#");
             switch (splitRequest[0]){
-                
+                case "MeetRequest": requestMeetRequest(splitRequest);
+                case "Meet": requestMeet(splitRequest);
             }
         }
     }
     
-    private static void requestMulticast(String tokens){
+    private static void requestMeetRequest(String[] tokens){
+        PrintWriter rout = USERS.get(tokens[1]);
         
+        if (rout == null)
+            return;
+        
+        sendTo("MeetRequest$" + tokens[2], rout);
+    }
+    
+    private static void requestMeet(String[] tokens){
+        PrintWriter rout = USERS.get(tokens[1]);
+        
+        if (rout == null)
+            return;
+        
+        String resp = "Meet$" + tokens[2];
+        for (int i = 3; i < tokens.length; i++) {
+            resp = resp + "$" + tokens[i];
+        }
+        
+        sendTo(resp, rout);
     }
     
     @Override

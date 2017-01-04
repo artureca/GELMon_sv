@@ -113,11 +113,11 @@ abstract public class Protocol extends Thread{
      */
     abstract public void kill();
     
-    protected void sentTo(String data, PrintWriter out){
+    protected static void sendTo(String data, PrintWriter out){
         synchronized(out){
             out.println(data);
         }
-        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + data + " | To: " + this.toString());
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Sent: " + data);
     }
     
 }
