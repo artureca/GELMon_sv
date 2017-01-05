@@ -65,6 +65,8 @@ abstract public class Protocol extends Thread{
                 outputLine = this.decode(inputLine);
                 if (outputLine == null) 
                     break;
+                if (" ".equals(outputLine))
+                    continue;
                 synchronized(this.out){
                     this.out.println(outputLine);
                 }
