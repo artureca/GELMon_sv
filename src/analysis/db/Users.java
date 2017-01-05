@@ -19,7 +19,7 @@ public class Users extends MySQL{
     ResultSet rs;
     
     
-    public boolean vfLogin(String name, String email, String sessionid){      
+    public boolean vfLogin(String name, String email, int number){      
              
         try{
             String query= "SELECT * FROM users WHERE email = ?";
@@ -31,11 +31,13 @@ public class Users extends MySQL{
                 System.out.println("Login OK");
                return true;
                
-            }else{
+             }else{
                 System.out.println("User não existe. Adicionado");
-                String query2= "INSERT INTO users (email) values(?) ";
+                String query2= "INSERT INTO users (email,name,number) values(?,?,?) ";
                 st1 = con.prepareStatement(query2);
                 st1.setString(1,email);
+                st1.setString(2, name);
+                st1.setInt(3, number);
                 st1.executeUpdate();
                 return true;
             }
