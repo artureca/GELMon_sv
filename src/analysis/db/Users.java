@@ -8,6 +8,8 @@ package analysis.db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -47,5 +49,64 @@ public class Users extends MySQL{
         }
         
      return true;   
-    }    
+    }
+
+    public static boolean isInteger(String s){ //Funcao para ver se a string é um numero inteiro (numero telefone)
+            try{
+                Integer.parseInt(s);
+            } catch(NumberFormatException e){
+                return false;
+            } catch(NullPointerException e){
+                return false;
+            }
+            return true;
+        }
+    
+    public ArrayList<String> getFriendsInfo(ArrayList<String> lAmigos){
+        
+        ArrayList<String> sInfo = new ArrayList<String>();
+        int j;
+        
+        for(j=0;j<lAmigos.size();j++){
+            if (isInteger(lAmigos.get(j))){
+                try{ //pesquisa SQL para extrair dados caso seja numero de telefone
+                    String query = "SELECT * FROM users WHERE number = ?";
+                    st1 = con.prepareStatement(query);
+                    st1.setInt(1, Integer.parseInt(lAmigos.get(j)));
+                    rs = st1.executeQuery();
+                    if(rs.next()) {
+                        String la1 = rs.getString("email"); //busca sql para obter do nickname do user
+                        String la2 = rs.getString("name");//busca sql para obter do nome do user
+                        String la3 = rs.getString("number");//busca sql para obter do email do user
+                        sInfo.add(la1);
+                        sInfo.add(la2);
+                        sInfo.add(la3);
+                    }
+                }catch (SQLException e) {
+                    e.getMessage();
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try{ //pesquisa SQL para extrair dados caso seja email
+                    String query = "SELECT * FROM users WHERE email LIKE ?";
+                    st1 = con.prepareStatement(query);
+                    st1.setString(1, lAmigos.get(j));
+                    rs = st1.executeQuery();
+                    if(rs.next()) {
+                        String la1 = rs.getString("email"); //busca sql para obter do nickname do user
+                        String la2 = rs.getString("name");//busca sql para obter do nome do user
+                        String la3 = rs.getString("number");//busca sql para obter do email do user
+                        sInfo.add(la1);
+                        sInfo.add(la2);
+                        sInfo.add(la3);
+                    }
+                }catch (SQLException e) {
+                    e.getMessage();
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sInfo;
+    }
 }
