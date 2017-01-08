@@ -21,6 +21,7 @@ import analysis.bl.Logic;
 import tools.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -64,6 +65,7 @@ public class Proto_AZGO extends Protocol {
             case "Meet" : return handlerMeet(tokens);
             case "MeetRequest" : return handlerMeetRequest(tokens);
             case "Coordinates": return handlerCoordinates(tokens); 
+            case "Friends": return handlerFriends(tokens);
             default: return received.concat("_OK");
         }
     }
@@ -106,7 +108,20 @@ public class Proto_AZGO extends Protocol {
         Logic.addLocation(lat, longi);
         
         return "Coordinates".concat("$").concat("OK") ;
-    }    
+    }   
+    
+    private String handlerFriends(String[] tokens){
+       
+       ArrayList<String> lAmigos = new ArrayList<String>();
+        
+       for(int i=1;i<tokens.length;i++){
+           lAmigos.add(tokens[i]);
+       }
+       
+       String envio = Logic.getFriendsInf(lAmigos);
+       
+       return envio;
+    }  
 
     private static void requestHandler(){
         for(;;){
