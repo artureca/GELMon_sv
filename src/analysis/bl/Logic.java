@@ -533,45 +533,6 @@ public class Logic {
         generateVideo(System.currentTimeMillis());
     }
     
-    public static String extrairCampo(String mensagem, int campo) {//Funcao que extrai os campos da string no formato
-        if (campo < 1) {                                    //Friends$info1$info2$...$infon$
-            return "CampoInexistente";
-        }
-        if (campo == 1) {
-
-            if (mensagem.length() > 4) {//menor mensagem válida tem 5 caracteres
-                int index = mensagem.indexOf("$"); //index do primeiro $ na string
-                String resposta = "erro"; //caso nao tenha $ isto é a msg passada
-                if (index > 0) { //index=-1 quando nao existe divisor
-                    resposta = mensagem.substring(0, index);//campo começa na posição 0 e termina no $
-                }
-                //System.out.println("campo " + campo + "=" + resposta);
-                return resposta;//devolve a string separada
-            } else {
-                return "erroMsgPequena";
-            }
-        } else {
-            if (mensagem.length() > (1 + (3 * campo))) {//menor mensagem válida tem 11 caracteres
-                int inicio = 0;
-                for (int i = 1; i < campo; i++) {
-                    inicio = mensagem.indexOf("$", inicio) + 1; //index do início do iésimo campo
-                    if (inicio == 0) { //-1 se nao existe, + 1
-                        return "msgMalFormatadaOuCampoInexistente";
-                    }
-                }
-                int fim = mensagem.indexOf("$", inicio); //index do fim do terceiro campo
-                if (fim == -1) {
-                    return "msgMalFormatadaOuCampoInexistente";
-                }
-                String resposta = mensagem.substring(inicio, fim);//campo começa na posição inicio e termina no $
-                //System.out.println("campo " + campo + "=" + resposta);
-                return resposta;//devolve a string separada
-            } else {
-                return "erroMsgPequena";
-            }
-        }
-    }
-    
     public static String getFriendsInf (ArrayList<String> lAmigos){
         
         int i,n;
