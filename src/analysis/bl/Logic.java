@@ -572,29 +572,22 @@ public class Logic {
         }
     }
     
-    public static String getFriendsInf (String info){
+    public static String getFriendsInf (ArrayList<String> lAmigos){
         
-        int i=2,n;
-        String aux = null;
-        ArrayList<String> lAmigos = new ArrayList<String>();
+        int i,n;
         
-        while (true){ //Guardar campos com info numa lista
-            aux = extrairCampo(info, i);
-            if (aux.equals("msgMalFormatadaOuCampoInexistente"))
-                break;
-            lAmigos.add(aux);
-            i++;
-        }
+        ArrayList<String> lAmigosTemp = new ArrayList<String>();
+        lAmigosTemp=lAmigos;
         
-        for(i=0;i<lAmigos.size();i++){ //verifica se ha repeticao de dados e elimina dados repetidos
-            //System.out.println(lAmigos.get(i));
-            for(n=i+1;n<lAmigos.size();n++){
-                if (lAmigos.get(i).equals(lAmigos.get(n)))
-                    lAmigos.remove(n);
+        for(i=0;i<lAmigosTemp.size();i++){ //verifica se ha repeticao de dados e elimina dados repetidos
+            //System.out.println(lAmigosTemp.get(i));
+            for(n=i+1;n<lAmigosTemp.size();n++){
+                if (lAmigosTemp.get(i).equals(lAmigosTemp.get(n)))
+                    lAmigosTemp.remove(n);
             }
         }
         
-        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigos); //Acede a DB para buscar info
+        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigosTemp); //Acede a DB para buscar info
         
         String envio="Friends$";  //Gera string formatada para return
         int sep=2;
