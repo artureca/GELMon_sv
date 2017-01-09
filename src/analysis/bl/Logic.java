@@ -201,6 +201,7 @@ public class Logic {
 
     private static void generateVideo(Long d){
         int i=0;
+        d=d/1000;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
         
