@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import tools.FileSystem;
 
 /**
- *
+ * Parent Class for the child classes that handle storing and retrieving of information to and from the database.
  * @author ???
  */
 public class MySQL {
@@ -33,18 +33,20 @@ public class MySQL {
     private static final String PASS = "setec1617";
     static Connection con = null;
     
-     public static void setup() {
+    /**
+    * Method that sets up the connection to the database.
+    */
+    public static void setup() {
          
-        try{
-            
+        try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(
                     FileSystem.getConfig("MYSQL.url"),
                     FileSystem.getConfig("MYSQL.user"),
                     FileSystem.getConfig("MYSQL.password")
             );
-        }catch (ClassNotFoundException | SQLException ex){
-            System.out.println("erro " +ex);
+        } catch (ClassNotFoundException | SQLException ex){
+            System.out.println("erro " + ex);
         }
     } 
     

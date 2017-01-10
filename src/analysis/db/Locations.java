@@ -7,92 +7,162 @@ package analysis.db;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import tools.Pair;
 
 /**
- *
- * @author Bruno
+ * Class that handles the storing and retrieving of data from the locations table.
+ * @author Bruno, Fábio Cunha
  */
-public class Locations extends MySQL{
-    
+public class Locations extends MySQL {
     
     PreparedStatement st1;
     ResultSet rs;
     
-    public boolean setLocation(double latitude, double longitude, long l_time,String email){
+    /**
+     *  Locations class constructor.
+     */
+    public Locations() {
+        Locations.setup();
+    }
+    
+    /**
+     *  Inserts a row into the locations table.
+     * @param latitude Latitude of the location.
+     * @param longitude Longitude of the location.
+     * @param l_time Timestamp representing the time at which the position was recorded.
+     * @param email Email of the user of which the position is being store.
+     * @param tmsi TMSI of the user of which the position is being store.
+     * @return Returns True if successful.
+     */
+    public boolean setLocation(double latitude, double longitude, long l_time, String email, String tmsi) {
         
-        System.out.println("Inserting location: "+latitude+" ,"+longitude+" @"+l_time);
+        System.out.println("Inserting location: " + latitude + " ," + longitude + " @" + l_time);
         
-        try{
-            String query= "INSERT INTO locations (latitude,longitude,tmsi,l_time) values(?,?,?,?) ";
+        try {
+            String query= "INSERT INTO locations (latitude, longitude, l_time, email, tmsi) values(?, ?, ?, ?, ?) ";
             st1 = con.prepareStatement(query);
-            st1.setDouble(1,latitude);
-            st1.setDouble(2,longitude);
-            st1.setLong(3,l_time);
+            st1.setDouble(1, latitude);
+            st1.setDouble(2, longitude);
+            st1.setLong(3, l_time);
             st1.setString(4, email);
+            st1.setString(5, tmsi);
             st1.executeUpdate();
          
-        }catch(Exception ex){
-            System.out.println("setLocation error:"+ex);
+        } catch(SQLException ex){
+            System.out.println("setLocation error: " + ex);
         }
         
         return true;   
     }
     
     /**
-     *  Metam a merda do javadoc para um gajo saber como trabalhar com isto!!!.
-     * @param i_time
-     * @param f_time
-     * @return Pair<Latitude,Longitude>
+     *  Inserts a row into the locations table.
+     * @param latitude Latitude of the location.
+     * @param longitude Longitude of the location.
+     * @param l_time Timestamp representing the time at which the position was recorded.
+     * @param email Email of the user of which the position is being store.
+     * @return Returns True if successful.
      */
-    public ArrayList<Pair<Double,Double>> getLocation(long i_time,long f_time){
+    public boolean setLocation(double latitude, double longitude, long l_time, String email) {
+        
+        if(!isEmailValid(email)) return false;
+        
+        System.out.println("Inserting location: " + latitude + " ," + longitude + " @" + l_time);
+        
+        try {
+            String query = "INSERT INTO locations (latitude, longitude, l_time, email) values(?, ?, ?, ?) ";
+            st1 = con.prepareStatement(query);
+            st1.setDouble(1, latitude);
+            st1.setDouble(2, longitude);
+            st1.setLong(3, l_time);
+            st1.setString(4, email);
+            st1.executeUpdate();
+         
+        } catch(SQLException ex){
+            System.out.println("setLocation error: " + ex);
+            return false;
+        }
+        
+        return true;   
+    }
+    
+    /**
+     *  Retrieves the coordinates of the recorded positions between two moments in time..
+     * @param i_time Timestamp of the initial time.
+     * @param f_time Timestamp of the final time.
+     * @return Returns an ArrayList of Pair<Double,Double> with positions recorded.
+     */
+    public ArrayList<Pair<Double,Double>> getLocation(long i_time, long f_time){
        
         ArrayList<Pair<Double,Double>> arrayList = new ArrayList<>(); 
         
-        try{
-            String query= "SELECT latitude,longitude FROM locations WHERE l_time >= ? and l_time <= ? ";
+        if(i_time > f_time) return arrayList;
+        
+        try {
+            String query = "SELECT latitude, longitude FROM locations WHERE l_time >= ? and l_time <= ? ";
             st1 = con.prepareStatement(query);
-            st1.setLong(1,i_time);
-            st1.setLong(2,f_time);
-            rs=st1.executeQuery();
+            st1.setLong(1, i_time);
+            st1.setLong(2, f_time);
+            rs = st1.executeQuery();
             
             while(rs.next())
                 arrayList.add(new Pair<>(rs.getDouble("latitude"),rs.getDouble("longitude")));
             
-        }catch(Exception ex){
-            System.out.println("getLocation error:"+ex);
+        } catch(SQLException ex){
+            System.out.println("getLocation error:" + ex);
         }
         
-        return arrayList;   
+        return arrayList;
     }
-    
 
-    public  ArrayList<Long> getTimeLocation(long i_time,long f_time){
+    /**
+     *  Retrieves the timestamps of the recorded positions between two moments in time..
+     * @param i_time Timestamp of the initial time.
+     * @param f_time Timestamp of the final time.
+     * @return Returns an ArrayList of timestamps of positions recorded.
+     */
+    public ArrayList<Long> getTimeLocation(long i_time, long f_time){
        
         ArrayList<Long> arrayList = new ArrayList<>();
-        int i=0; //for testing
+        String query = "SELECT l_time FROM locations WHERE l_time >= ? and l_time <= ?";
         
-        try{
-            String query= "SELECT l_time FROM locations WHERE l_time >= ? and l_time <= ? ";
+        if(i_time > f_time) return arrayList;
+        
+        try {
             st1 = con.prepareStatement(query);
             st1.setLong(1, i_time);
             st1.setLong(2, f_time);
-            rs=st1.executeQuery();
+            rs = st1.executeQuery();
             
-            while(rs.next()){
-                    arrayList.add(rs.getLong("l_time"));
-                    System.out.println(arrayList.get(i));//for testing
-                    i++;//for testing
+            while(rs.next()) {
+                arrayList.add(rs.getLong("l_time"));
             }
-         
-        }catch(Exception ex){
-            System.out.println("getLocation error:"+ex);
+            
+        } catch(SQLException ex){
+            System.out.println("getLocation error:" + ex);
         }
         
         return arrayList;   
     }
     
-    
+    /**
+     *  Check if email string is valid.
+     * @param email String to evaluate.
+     * @return Returns true if valid and false otherwise.
+     */
+    private static boolean isEmailValid(String email) {
+        
+        try {
+           InternetAddress emailAddr = new InternetAddress(email);
+           emailAddr.validate();
+        } catch (AddressException ex) {
+           return false;
+        }
+        return true;
+}
     
 }

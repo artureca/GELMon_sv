@@ -23,10 +23,10 @@ public class Image extends MySQL {
     
     PreparedStatement st1;
     
-    public boolean setImage(String path,Timestamp i_time,Timestamp f_time){
+    public boolean setImage(String path, Timestamp i_time, Timestamp f_time) {
         
         try{
-            String query= "INSERT INTO images (path,i_time,f_time) values(?,?,?) ";
+            String query = "INSERT INTO images (path,i_time,f_time) values(?,?,?) ";
             st1 = con.prepareStatement(query);
             st1.setString(1,path);
             st1.setTimestamp(2,i_time);

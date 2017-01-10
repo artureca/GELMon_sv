@@ -5,37 +5,42 @@
  */
 package analysis.db;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- *
- * @author Bruno
+ * Class that handles the storing and retrieving of data from the users table.
+ * @author Bruno, Fábio Cunha
  */
 public class Users extends MySQL{
             
     PreparedStatement st1;
     ResultSet rs;
     
-    
+    /**
+    * Method that logs in a user and creates one if it doesn't exist in the database.
+    * @param name User's name.
+    * @param email User's email.
+    * @param number User's phone number.
+    * @return Return true if successful and false otherwise.
+    */
     public boolean vfLogin(String name, String email, int number){      
              
         try{
-            String query= "SELECT * FROM users WHERE email = ?";
+            String query = "SELECT * FROM users WHERE email = ?";
             st1 = con.prepareStatement(query);
             st1.setString(1,email);
             rs=st1.executeQuery();
             
             if(rs.next()){
                 System.out.println("Login OK");
-               return true;
+                return true;
                
-             }else{
+            } else {
                 System.out.println("User não existe. Adicionado");
-                String query2= "INSERT INTO users (email,name,number) values(?,?,?) ";
+                String query2= "INSERT INTO users (email, name, number) values(?, ?, ?) ";
                 st1 = con.prepareStatement(query2);
                 st1.setString(1,email);
                 st1.setString(2, name);
@@ -44,30 +49,40 @@ public class Users extends MySQL{
                 return true;
             }
             
-        }catch(Exception ex){
-            System.out.println("vfLogin error:"+ex);
+        } catch(SQLException ex) {
+            System.out.println("vfLogin error:" + ex);
         }
         
      return true;   
     }
 
-    public static boolean isInteger(String s){ //Funcao para ver se a string é um numero inteiro (numero telefone)
-            try{
-                Integer.parseInt(s);
-            } catch(NumberFormatException e){
-                return false;
-            } catch(NullPointerException e){
-                return false;
-            }
-            return true;
+    /**
+    * Method that tests if a string represents an integer.
+    * @param s String to test.
+    * @return Return true if s is an integer and false otherwise.
+    */
+    private static boolean isInteger(String s){
+        
+        try {
+            Integer.parseInt(s);
+        } catch (NumberFormatException | NullPointerException e){
+            return false;
         }
+        
+        return true;
+    }
     
+    /**
+    * Method that retrieves the users' friends.
+    * @param lAmigos The ArrayList<String> of users of which the friends are to be retrieved.
+    * @return Returns the friends in a ArrayList<String> form.
+    */
     public ArrayList<String> getFriendsInfo(ArrayList<String> lAmigos){
         
         ArrayList<String> sInfo = new ArrayList<String>();
         int j;
         
-        for(j=0;j<lAmigos.size();j++){
+        for(j = 0; j < lAmigos.size(); j++){
             if (isInteger(lAmigos.get(j))){
                 try{ //pesquisa SQL para extrair dados caso seja numero de telefone
                     String query = "SELECT * FROM users WHERE number = ?";
