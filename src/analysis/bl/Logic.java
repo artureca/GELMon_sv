@@ -205,12 +205,14 @@ public class Logic {
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
         
-        for (long t=d; t<d+84600;t=t+600){ 
+        for (long t=d; t<d+100;t=t+600){ 
             Heatmap img = generateHeatmap(t,t+1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
             i++;
         }
+            
+        System.out.println("Finished HEATMAP");
         
         try {
             Runtime.getRuntime().exec("ffmpeg -framerate 24 -i " + filePath + "/%d.png -c:v libx264 -vf fps=24 -pix_fmt yuv420p " + filePath +".mp4");
