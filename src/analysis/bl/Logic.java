@@ -205,7 +205,7 @@ public class Logic {
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
         
-        for (long t=d; t<d+100;t=t+600){ 
+        for (long t=d; t<d+84600;t=t+600){ 
             Heatmap img = generateHeatmap(t,t+1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
@@ -213,11 +213,14 @@ public class Logic {
         }
             
         System.out.println("Finished HEATMAP");
+      
         
         try {
             Runtime.getRuntime().exec("ffmpeg -framerate 24 -i " + filePath + "/%d.png -c:v libx264 -vf fps=24 -pix_fmt yuv420p " + filePath +".mp4");
             Runtime.getRuntime().exec("rm -f " + filePath + "/*");
             Runtime.getRuntime().exec("rmdir -f " + filePath);
+            System.out.println("Finished video");
+
         } catch (IOException ex) {
             Logger.getLogger(Logic.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -322,7 +325,7 @@ public class Logic {
         
         Heatmap.setup();
         MySQL.setup();
-        
+            
         // DELAY: 24h - horaActual + 2, executa o runDaily todos os dias as 2h
         SCHEDULER.scheduleAtFixedRate(new Thread(){
             @Override
@@ -500,7 +503,7 @@ public class Logic {
         String ret= MD5.crypt(inte.toString());
         
         Users cenas = new Users();
-        cenas.vfLogin(name, email, ret);
+        //cenas.vfLogin(name, email, ret);
 
         return ret;
     }
@@ -528,7 +531,7 @@ public class Logic {
     }
     
     public static void addLocation(double latitude, double longitude){
-        new Locations().setLocation(latitude, longitude, "0", System.currentTimeMillis());
+        //new Locations().setLocation(latitude, longitude, "0", System.currentTimeMillis());
     }
 
     public static void runDaily(){

@@ -9,8 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+//import javax.mail.internet.AddressException;
+//import javax.mail.internet.InternetAddress;
 import tools.Pair;
 
 /**
@@ -69,7 +69,7 @@ public class Locations extends MySQL {
      */
     public boolean setLocation(double latitude, double longitude, long l_time, String email) {
         
-        if(!isEmailValid(email)) return false;
+        //if(!isEmailValid(email)) return false;
         
         System.out.println("Inserting location: " + latitude + " ," + longitude + " @" + l_time);
         
@@ -149,20 +149,6 @@ public class Locations extends MySQL {
         return arrayList;   
     }
     
-    /**
-     *  Check if email string is valid.
-     * @param email String to evaluate.
-     * @return Returns true if valid and false otherwise.
-     */
-    private static boolean isEmailValid(String email) {
-        
-        try {
-           InternetAddress emailAddr = new InternetAddress(email);
-           emailAddr.validate();
-        } catch (AddressException ex) {
-           return false;
-        }
-        return true;
-}
+
     
 }
