@@ -78,7 +78,7 @@ abstract public class Protocol extends Thread{
 
         } catch (IOException e) {
             // Ignore exception!!!
-            //Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            e.printStackTrace();
         }
     }
     
