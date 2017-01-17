@@ -577,36 +577,30 @@ public class Logic {
 
         int i, n;
 
-        ArrayList<String> lAmigosTemp;
-        lAmigosTemp = lAmigos;
+        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigos); //Acede a DB para buscar info
 
-        for (i = 0; i < lAmigosTemp.size(); i++) { //verifica se ha repeticao de dados e elimina dados repetidos
-            //System.out.println(lAmigosTemp.get(i));
-            for (n = i + 1; n < lAmigosTemp.size(); n++) {
-                if (lAmigosTemp.get(i).equals(lAmigosTemp.get(n))) {
-                    lAmigosTemp.remove(n);
+        for (i = 0; i < sInfo.size(); i++) { //verifica se ha repeticao de dados e elimina dados repetidos
+            //System.out.println(sInfo.get(i));
+            for (n = i + 1; n < sInfo.size(); n++) {
+                if (sInfo.get(i).equals(sInfo.get(n))) {
+                    sInfo.remove(n);
                 }
             }
         }
-
-        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigosTemp); //Acede a DB para buscar info
-
+        
         String envio = "Friends$";  //Gera string formatada para return
-        int sep = 2;
-        for (i = 0; i < sInfo.size(); i++) {
-            if (i == sep) {
-                if ((sInfo.get(i) == null) || (sInfo.get(i).equals("0"))) {
-                    envio = envio + " " + "$";
-                } else {
-                    envio = envio + sInfo.get(i) + "$";
-                }
-                sep = sep + 3;
-            } else {
-                if ((sInfo.get(i) == null) || (sInfo.get(i).equals("0"))) {
-                    envio = envio + " " + "#";
-                } else {
-                    envio = envio + sInfo.get(i) + "#";
-                }
+        User user1;
+        
+        for(i = 0; i < sInfo.size(); i++){
+            user1 = LOGGEDIN.get(sInfo.get(i));
+            if(user1 != null){
+                if (user1.getName() == null)
+                    envio = envio + " " + "#"; 
+                else envio = envio + user1.getName() + "#";
+                envio = envio + user1.getEmail() + "#";
+                if(user1.getPhoneNumber().equals("0"))
+                    envio = envio + " " + "$"; 
+                else envio = envio + user1.getPhoneNumber() + "$";
             }
         }
 
