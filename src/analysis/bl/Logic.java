@@ -181,15 +181,15 @@ public class Logic {
         return fileURL;
     }
 
-    public static void requetsMeet(String origin, String target) {
+    public static void requetsMeet(String emailA, String emailB, String room) {
 
-        User user = LOGGEDIN.get(target);
+        User user = LOGGEDIN.get(emailB);
         if (user == null) {
-            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Meet error: " + target + " not on-line.");
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Meet error: " + emailB + " not on-line.");
             return;
         }
 
-        addRequest("MeetRequest#" + target + "#" + origin);
+        addRequest("MeetRequest#" + user.getSessionid() + "#" + emailA + "#" + room);
 
     }
 
@@ -200,22 +200,14 @@ public class Logic {
         }
     }
 
-    public static void requetsMeet(String target, String origin, Boolean resp) {
+    public static void requetsMeet(String emailA, String emailB, String room, String resp) {
 
-        User user = LOGGEDIN.get(target);
+        User user = LOGGEDIN.get(emailA);
         if (user == null) {
             return;
         }
 
-        if (!resp) {
-            addRequest("Meet#" + origin + "#" + target + "#FAIL");
-            return;
-        }
-
-        Double lat = 0.0; // get target coordinates
-        Double lon = 0.0; // from the database
-
-        addRequest("Meet#" + origin + "#" + target + "#OK#" + lat + "#" + lon);
+        addRequest("Meet#" + user.getSessionid() + "#" + emailB + "#" + room + "#" + resp);
     }
 
     private static void generateVideo(Long d) {
@@ -358,7 +350,7 @@ public class Logic {
                 runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
-        }, 5, 7200, TimeUnit.SECONDS);
+        }, 5,TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
     }
 
     public static int[] getNumberOfLocationsByHour() {
@@ -537,7 +529,11 @@ public class Logic {
 
     public static void logoutUser(String sid, String email) {
         synchronized (LOGGEDIN) {
-            if (LOGGEDIN.get(email).getSessionid().equals(sid)) {
+            User util = LOGGEDIN.get(email);
+            if (util == null) {
+                return;
+            }
+            if (util.getSessionid().equals(sid)) {
                 LOGGEDIN.remove(email);
             }
         }
@@ -581,7 +577,7 @@ public class Logic {
 
         int i, n;
 
-        ArrayList<String> lAmigosTemp = new ArrayList<>();
+        ArrayList<String> lAmigosTemp;
         lAmigosTemp = lAmigos;
 
         for (i = 0; i < lAmigosTemp.size(); i++) { //verifica se ha repeticao de dados e elimina dados repetidos

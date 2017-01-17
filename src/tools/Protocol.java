@@ -78,7 +78,7 @@ abstract public class Protocol extends Thread{
 
         } catch (IOException e) {
             // Ignore exception!!!
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
     

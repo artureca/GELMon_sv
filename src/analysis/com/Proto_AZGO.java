@@ -81,6 +81,10 @@ public class Proto_AZGO extends Protocol {
     }
 
     private String handlerLogin(String[] tokens) {
+        if (tokens.length != 4) {
+            return " ";
+        }
+
         String email = tokens[2];
         String name = tokens[1];
         String num = tokens[3];
@@ -93,19 +97,44 @@ public class Proto_AZGO extends Protocol {
     }
 
     private String handlerLogout() {
+        if (this.currentUser == null) {
+            return null;
+        }
         Pair<String, PrintWriter> deadSession = USERS.get(this.currentUser);
+        if (deadSession == null) {
+            return null;
+        }
         Logic.logoutUser(this.currentUser, deadSession.getK());
         USERS.remove(this.currentUser);
         return null;
     }
 
     private String handlerMeet(String[] tokens) {
-        Logic.requetsMeet(this.currentUser, tokens[1]);
+        if (tokens.length != 3 || this.currentUser == null) {
+            return " ";
+        }
+        
+        Pair<String, PrintWriter> rout = USERS.get(this.currentUser);
+        if (rout == null) {
+            return " ";
+        }
+        
+        if (rout.getK().equals(tokens[1])) {
+            
+        }
+        Logic.requetsMeet(rout.getK(), tokens[1], tokens[2]);
         return " ";
     }
 
     private String handlerMeetRequest(String[] tokens) {
-        Logic.requetsMeet(this.currentUser, tokens[1], tokens[2].equals("OK"));
+        if (tokens.length != 4 || this.currentUser == null) {
+            return " ";
+        }
+        Pair<String, PrintWriter> rout = USERS.get(this.currentUser);
+        if (rout == null) {
+            return " ";
+        }
+        Logic.requetsMeet(tokens[1], rout.getK(), tokens[2], tokens[3]);
         return " ";
     }
 
@@ -122,7 +151,7 @@ public class Proto_AZGO extends Protocol {
 
     private String handlerFriends(String[] tokens) {
 
-        ArrayList<String> lAmigos = new ArrayList<String>();
+        ArrayList<String> lAmigos = new ArrayList<>();
 
         for (int i = 1; i < tokens.length; i++) {
             lAmigos.add(tokens[i]);
@@ -147,9 +176,8 @@ public class Proto_AZGO extends Protocol {
                     }
                 }
             }
-            
-        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Processing Request: " + request);
-            
+
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Processing Request: " + request);
 
             String splitRequest[] = request.split("#");
             switch (splitRequest[0]) {
@@ -170,12 +198,18 @@ public class Proto_AZGO extends Protocol {
         Pair<String, PrintWriter> rout = USERS.get(tokens[1]);
 
         if (rout == null) {
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Meet error: " + tokens[2] + " is null.");
             return;
         }
 
-        sendTo("MeetRequest$" + tokens[2], rout.getV());
+        String resp = "MeetRequest$" + tokens[2];
+        for (int i = 3; i < tokens.length; i++) {
+            resp = resp + "$" + tokens[i];
+        }
+        
+        sendTo(resp, rout.getV());
     }
-
+    
     private static void requestKillMe(String[] tokens) {
         Pair<String, PrintWriter> rout = USERS.get(tokens[1]);
 
@@ -183,7 +217,10 @@ public class Proto_AZGO extends Protocol {
             return;
         }
 
-        sendTo("KILLME", rout.getV());
+        sendTo("KillMe$" + tokens[1], rout.getV());
+
+        rout.getV().flush();
+        rout.getV().close();
     }
 
     private static void requestMeet(String[] tokens) {
