@@ -218,9 +218,25 @@ public class Logic {
         addRequest("Meet#" + user.getSessionid() + "#" + emailB + "#" + room + "#" + resp);
     }
 
+    
+    private static void hourlyHeatmap(Long d){
+            int i = 0;
+            d = (d / 1000)-84600;
+            String fileName = MD5.crypt(d.toString());
+            String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
+        
+            for (long t = d; t < d + 84600; t = t + 3600) {
+            Heatmap img = generateHeatmap(t, t + 3540);
+            BufferedImage image = img.toBufferedImage();
+            FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
+            i++;
+        }
+             System.out.println("Finished HEATMAP Hourly");
+    }
+    
     private static void generateVideo(Long d) {
         int i = 0;
-        d = d / 1000;
+        d = (d / 1000)-84600;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
 
@@ -581,6 +597,8 @@ public class Logic {
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
+        hourlyHeatmap(System.currentTimeMillis());
+        
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {
