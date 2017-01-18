@@ -221,16 +221,22 @@ public class Logic {
     
     private static void hourlyHeatmap(Long d){
             int i = 0;
-            d = (d / 1000)-84600;
-            String fileName = MD5.crypt(d.toString());
-            String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
-        
-            for (long t = d; t < d + 84600; t = t + 3600) {
-            Heatmap img = generateHeatmap(t, t + 3540);
-            BufferedImage image = img.toBufferedImage();
-            FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
-            i++;
-        }
+            d -= TimeUnit.DAYS.toMillis(1);
+         
+            for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
+                long hour1 = TimeUnit.MILLISECONDS.toHours(t);
+                Long date1= TimeUnit.HOURS.toMillis(hour1);
+                Long date2= TimeUnit.HOURS.toMillis((hour1 + 1)%24);
+                String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+                String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
+                Heatmap img = generateHeatmap(t, t + 3540);
+                BufferedImage image = img.toBufferedImage();
+                     synchronized (LOCK) {
+                     FileSystem.saveImage(filePath, image);
+                     PROCESSING.remove(fileName);
+                     LOCK.notifyAll();
+                    }
+            }
              System.out.println("Finished HEATMAP Hourly");
     }
     
