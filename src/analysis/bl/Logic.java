@@ -49,6 +49,15 @@ public class Logic {
     private static final Object LOCK = new Object();
     public static final ConcurrentLinkedQueue<String> REQUESTS = new ConcurrentLinkedQueue<>();
 
+    public static final void printLOGGEDIN() {
+        System.out.println("LOGGEDIN: ");
+        synchronized (LOGGEDIN) {
+            LOGGEDIN.entrySet().stream().forEach((pair) -> {
+                System.out.println("\t" + pair.getKey() + " | " + pair.getValue().toString());
+            });
+        }
+    }
+
     private static Boolean checkFile(String fileName, String filePath) {
         synchronized (LOCK) {
             while (true) {
@@ -98,7 +107,6 @@ public class Logic {
         ArrayList<Pair<Double, Double>> points = new Locations().getLocation(date1, date2);
 
         Double[][] values = new Double[Heatmap.getBackground().getWidth()][Heatmap.getBackground().getHeight()];
-        Double max = 0.0;
 
         for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
             for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
@@ -106,36 +114,36 @@ public class Logic {
             }
         }
 
-        for (Pair<Double, Double> point : points) {
+        points.parallelStream().map((point) -> {
             Pair<Double, Double> tmp = new Pair<>(point);
             point.setK(TMATRIX[0][0] * tmp.getK() + TMATRIX[0][1] * tmp.getV());
             point.setV(TMATRIX[1][0] * tmp.getK() + TMATRIX[1][1] * tmp.getV());
-
+            return point;
+        }).map((point) -> {
             if (point.getK() < 0) {
                 point.setK(0.0);
             }
+            return point;
+        }).map((point) -> {
             if (point.getV() < 0) {
                 point.setV(0.0);
             }
+            return point;
+        }).map((point) -> {
             if (point.getK() > Heatmap.getBackground().getWidth() - 1) {
                 point.setK(Heatmap.getBackground().getWidth() - 1.0);
             }
+            return point;
+        }).map((point) -> {
             if (point.getV() > Heatmap.getBackground().getHeight() - 1) {
                 point.setV(Heatmap.getBackground().getHeight() - 1.0);
             }
-
-            if (max < values[point.getK().intValue()][point.getV().intValue()]++) {
-                max = values[point.getK().intValue()][point.getV().intValue()];
+            return point;
+        }).forEachOrdered((point) -> {
+            synchronized (values) {
+                values[point.getK().intValue()][point.getV().intValue()] += 1.0;
             }
-
-        }
-        if (max != 0) {
-            for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
-                for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
-                    values[i][j] /= max;
-                }
-            }
-        }
+        });
 
         Heatmap heatmap = new Heatmap(Smooth(values, Heatmap.getBackground().getWidth(), Heatmap.getBackground().getHeight()));
         //Heatmap heatmap = new Heatmap(values);
@@ -181,15 +189,15 @@ public class Logic {
         return fileURL;
     }
 
-    public static void requetsMeet(String origin, String target) {
+    public static void requetsMeet(String emailA, String emailB, String room) {
 
-        User user = LOGGEDIN.get(target);
+        User user = LOGGEDIN.get(emailB);
         if (user == null) {
-            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Meet error: " + target + " not on-line.");
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Meet error: " + emailB + " not on-line.");
             return;
         }
 
-        addRequest("MeetRequest#" + target + "#" + origin);
+        addRequest("MeetRequest#" + user.getSessionid() + "#" + emailA + "#" + room);
 
     }
 
@@ -200,31 +208,44 @@ public class Logic {
         }
     }
 
-    public static void requetsMeet(String target, String origin, Boolean resp) {
+    public static void requetsMeet(String emailA, String emailB, String room, String resp) {
 
-        User user = LOGGEDIN.get(target);
+        User user = LOGGEDIN.get(emailA);
         if (user == null) {
             return;
         }
 
-        if (!resp) {
-            addRequest("Meet#" + origin + "#" + target + "#FAIL");
-            return;
-        }
-
-        Double lat = 0.0; // get target coordinates
-        Double lon = 0.0; // from the database
-
-        addRequest("Meet#" + origin + "#" + target + "#OK#" + lat + "#" + lon);
+        addRequest("Meet#" + user.getSessionid() + "#" + emailB + "#" + room + "#" + resp);
     }
 
+    
+    private static void hourlyHeatmap(Long d){
+            d -= TimeUnit.DAYS.toMillis(1);
+         
+            for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
+                long hour1 = TimeUnit.MILLISECONDS.toHours(t);
+                Long date1= TimeUnit.HOURS.toMillis(hour1);
+                Long date2= TimeUnit.HOURS.toMillis((hour1 + 1)%24);
+                String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+                String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
+                Heatmap img = generateHeatmap(t, t + 3540);
+                BufferedImage image = img.toBufferedImage();
+                     synchronized (LOCK) {
+                     FileSystem.saveImage(filePath, image);
+                     PROCESSING.remove(fileName);
+                     LOCK.notifyAll();
+                    }
+            }
+             System.out.println("Finished HEATMAP Hourly");
+    }
+    
     private static void generateVideo(Long d) {
         int i = 0;
-        d = d / 1000;
+        d = (d / 1000)-84600;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
 
-        for (long t = d; t < d + 84600; t = t + 600) {
+        for (long t = d; t < d + /*84600*/ 5*600; t = t + 600) {
             Heatmap img = generateHeatmap(t, t + 1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
@@ -281,9 +302,11 @@ public class Logic {
 
         System.out.println("Normalizing heatmap");
 
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                res[i][j] /= max;
+        if (max != 0) {
+            for (int i = 0; i < w; i++) {
+                for (int j = 0; j < h; j++) {
+                    res[i][j] /= max;
+                }
             }
         }
 
@@ -358,7 +381,7 @@ public class Logic {
                 runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
-        }, 5, 7200, TimeUnit.SECONDS);
+        }, 5, TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
     }
 
     public static int[] getNumberOfLocationsByHour() {
@@ -537,7 +560,11 @@ public class Logic {
 
     public static void logoutUser(String sid, String email) {
         synchronized (LOGGEDIN) {
-            if (LOGGEDIN.get(email).getSessionid().equals(sid)) {
+            User util = LOGGEDIN.get(email);
+            if (util == null) {
+                return;
+            }
+            if (util.getSessionid().equals(sid)) {
                 LOGGEDIN.remove(email);
             }
         }
@@ -575,41 +602,41 @@ public class Logic {
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
+        hourlyHeatmap(System.currentTimeMillis());
+        
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {
 
         int i, n;
 
-        ArrayList<String> lAmigosTemp = new ArrayList<>();
-        lAmigosTemp = lAmigos;
+        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigos); //Acede a DB para buscar info
 
-        for (i = 0; i < lAmigosTemp.size(); i++) { //verifica se ha repeticao de dados e elimina dados repetidos
-            //System.out.println(lAmigosTemp.get(i));
-            for (n = i + 1; n < lAmigosTemp.size(); n++) {
-                if (lAmigosTemp.get(i).equals(lAmigosTemp.get(n))) {
-                    lAmigosTemp.remove(n);
+        for (i = 0; i < sInfo.size(); i++) { //verifica se ha repeticao de dados e elimina dados repetidos
+            //System.out.println(sInfo.get(i));
+            for (n = i + 1; n < sInfo.size(); n++) {
+                if (sInfo.get(i).equals(sInfo.get(n))) {
+                    sInfo.remove(n);
                 }
             }
         }
 
-        ArrayList<String> sInfo = new Users().getFriendsInfo(lAmigosTemp); //Acede a DB para buscar info
-
         String envio = "Friends$";  //Gera string formatada para return
-        int sep = 2;
+        User user1;
+
         for (i = 0; i < sInfo.size(); i++) {
-            if (i == sep) {
-                if ((sInfo.get(i) == null) || (sInfo.get(i).equals("0"))) {
-                    envio = envio + " " + "$";
-                } else {
-                    envio = envio + sInfo.get(i) + "$";
-                }
-                sep = sep + 3;
-            } else {
-                if ((sInfo.get(i) == null) || (sInfo.get(i).equals("0"))) {
+            user1 = LOGGEDIN.get(sInfo.get(i));
+            if (user1 != null) {
+                if (user1.getName() == null) {
                     envio = envio + " " + "#";
                 } else {
-                    envio = envio + sInfo.get(i) + "#";
+                    envio = envio + user1.getName() + "#";
+                }
+                envio = envio + user1.getEmail() + "#";
+                if (user1.getPhoneNumber().equals("0")) {
+                    envio = envio + " " + "$";
+                } else {
+                    envio = envio + user1.getPhoneNumber() + "$";
                 }
             }
         }

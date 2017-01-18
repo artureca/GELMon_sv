@@ -110,37 +110,15 @@ public class Users extends MySQL{
                     st1.setInt(1, Integer.parseInt(lAmigos.get(j)));
                     rs = st1.executeQuery();
                     if(rs.next()) {
-                        String la1 = rs.getString("email"); //busca sql para obter do nickname do user
-                        String la2 = rs.getString("name");//busca sql para obter do nome do user
-                        String la3 = rs.getString("number");//busca sql para obter do email do user
+                        String la1 = rs.getString("email"); //busca sql para obter do email do user
                         sInfo.add(la1);
-                        sInfo.add(la2);
-                        sInfo.add(la3);
                     }
                 }catch (SQLException e) {
                     e.getMessage();
                     e.printStackTrace();
                 }
             }
-            else {
-                try{ //pesquisa SQL para extrair dados caso seja email
-                    String query = "SELECT * FROM users WHERE email LIKE ?";
-                    st1 = con.prepareStatement(query);
-                    st1.setString(1, lAmigos.get(j));
-                    rs = st1.executeQuery();
-                    if(rs.next()) {
-                        String la1 = rs.getString("email"); //busca sql para obter do nickname do user
-                        String la2 = rs.getString("name");//busca sql para obter do nome do user
-                        String la3 = rs.getString("number");//busca sql para obter do email do user
-                        sInfo.add(la1);
-                        sInfo.add(la2);
-                        sInfo.add(la3);
-                    }
-                }catch (SQLException e) {
-                    e.getMessage();
-                    e.printStackTrace();
-                }
-            }
+            else sInfo.add(lAmigos.get(j));
         }
         return sInfo;
     }
