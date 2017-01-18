@@ -220,7 +220,6 @@ public class Logic {
 
     
     private static void hourlyHeatmap(Long d){
-            int i = 0;
             d -= TimeUnit.DAYS.toMillis(1);
          
             for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
