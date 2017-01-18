@@ -75,6 +75,8 @@ public class Proto_AZGO extends Protocol {
                 return handlerCoordinates(tokens);
             case "Friends":
                 return handlerFriends(tokens);
+            case "Debug":
+                return handlerDebug();
             default:
                 return received.concat("_OK");
         }
@@ -98,29 +100,44 @@ public class Proto_AZGO extends Protocol {
 
     private String handlerLogout() {
         if (this.currentUser == null) {
+            System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Logout error: null user");
             return null;
         }
-        Pair<String, PrintWriter> deadSession = USERS.get(this.currentUser);
-        if (deadSession == null) {
-            return null;
+        synchronized (USERS) {
+            Pair<String, PrintWriter> deadSession = USERS.get(this.currentUser);
+            if (deadSession == null) {
+                System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Logout error: no user " + this.currentUser);
+                return null;
+            }
+            Logic.logoutUser(this.currentUser, deadSession.getK());
+            USERS.remove(this.currentUser);
         }
-        Logic.logoutUser(this.currentUser, deadSession.getK());
-        USERS.remove(this.currentUser);
         return null;
+    }
+
+    private String handlerDebug() {
+        Logic.printLOGGEDIN();
+        System.out.println("USERS: ");
+        synchronized (USERS) {
+            USERS.entrySet().stream().forEach((pair) -> {
+                System.out.println("\t" + pair.getKey() + " | " + pair.getValue().toString());
+            });
+        }
+        return " ";
     }
 
     private String handlerMeet(String[] tokens) {
         if (tokens.length != 3 || this.currentUser == null) {
             return " ";
         }
-        
+
         Pair<String, PrintWriter> rout = USERS.get(this.currentUser);
         if (rout == null) {
             return " ";
         }
-        
+
         if (rout.getK().equals(tokens[1])) {
-            
+
         }
         Logic.requetsMeet(rout.getK(), tokens[1], tokens[2]);
         return " ";
@@ -206,12 +223,13 @@ public class Proto_AZGO extends Protocol {
         for (int i = 3; i < tokens.length; i++) {
             resp = resp + "$" + tokens[i];
         }
-        
+
         sendTo(resp, rout.getV());
     }
-    
+
     private static void requestKillMe(String[] tokens) {
-        Pair<String, PrintWriter> rout = USERS.get(tokens[1]);
+        String uid = tokens[1];
+        Pair<String, PrintWriter> rout = USERS.get(uid);
 
         if (rout == null) {
             return;
@@ -221,6 +239,7 @@ public class Proto_AZGO extends Protocol {
 
         rout.getV().flush();
         rout.getV().close();
+        USERS.remove(uid);
     }
 
     private static void requestMeet(String[] tokens) {

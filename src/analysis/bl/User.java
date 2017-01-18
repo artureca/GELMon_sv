@@ -81,7 +81,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "email=" + email + ", phoneNumber=" + phoneNumber + ", sessionid=" + sessionid + ", name=" + name + '}';
+        return "User:" + this.hashCode() + ":{" + "email=" + email + ", phoneNumber=" + phoneNumber + ", sessionid=" + sessionid + ", name=" + name + '}';
     }
 
 }

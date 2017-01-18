@@ -26,9 +26,9 @@ import java.awt.image.BufferedImage;
  * @author Vânia Vieira
  */
 public class Image {
-    private final Pixel[][] pixelMap;
-    private final Integer width;
-    private final Integer height;
+    protected final Pixel[][] pixelMap;
+    protected final Integer width;
+    protected final Integer height;
     
     /**
      * Creates a matrix of pixels
