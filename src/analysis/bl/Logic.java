@@ -17,6 +17,7 @@
 package analysis.bl;
 
 import analysis.db.*;
+import analysis.db.Locations;
 import analysis.dsp.Heatmap;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -26,9 +27,11 @@ import java.util.concurrent.*;
 import tools.FileSystem;
 import java.util.Random;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.PerspectiveTransform;
+import tools.Pair;
 
 /**
  * A class with static methods used to process the clients requests.
@@ -296,6 +299,7 @@ public class Logic {
         }
     }
 
+   
     private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
         // 13x13 matrix
         double[][] matriz = {
@@ -592,6 +596,39 @@ public class Logic {
 
         return fileURL;
     }
+    
+    private static void generateLogs(Long d){
+        d -= TimeUnit.DAYS.toMillis(1);
+        Long dt=TimeUnit.MILLISECONDS.toDays(d);
+        String fileName = MD5.crypt(dt.toString());
+        String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName;
+        
+        Locations loc = new Locations();
+        
+        ArrayList <Pair<Point2D.Double,Long>> tudo= loc.getFullLocation(d, d+TimeUnit.DAYS.toMillis(1));
+        ConcurrentHashMap <String,ArrayList<Long>> data = new ConcurrentHashMap<>();
+        
+        tudo.parallelStream().forEach(location -> {
+            String building = getsBuilding(location.getK().getX(),location.getK().getY());
+            data.computeIfAbsent(building,k -> new ArrayList<>())
+                    .add(location.getV());
+        });
+        
+        data.forEach(building -> {
+                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(1));
+        });
+        
+            ArrayList<String> ret = new ArrayList<>();
+           
+            synchronized (LOCK) {
+            FileSystem.saveText(filePath, ret);
+            PROCESSING.remove(fileName);
+            LOCK.notifyAll();
+        
+        }
+        System.out.println("Finished Log Hourly");
+    }
+    
 
     public static String loginUser(String name, String email, String num) {
         Random sessionid = new Random();
@@ -631,7 +668,7 @@ public class Logic {
      * @param longitude
      * @return BlocoB, Eletro, Mecanica, Biblioteca, Info, Other
      */
-    public static String getsBuilding(double latitude, double longitude) {
+    private static String getsBuilding(double latitude, double longitude) {
 
         if ((41.177965 < latitude) && (latitude < 41.178443) && (longitude > -8.594829) && (longitude < -8.594320)) {
             return "Mecanica";
