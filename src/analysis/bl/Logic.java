@@ -335,7 +335,6 @@ public class Logic {
                 }
             }
         }
-            Coord wow;
         System.out.println("Normalizing heatmap");
 
         if (max != 0) {
