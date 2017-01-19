@@ -18,6 +18,9 @@
 package analysis.dsp;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import tools.Coord;
 
 /**
  * Represents an image transformed in a matrix of pixels
@@ -27,8 +30,6 @@ import java.awt.image.BufferedImage;
  */
 public class Image {
     protected final Pixel[][] pixelMap;
-    protected final Integer width;
-    protected final Integer height;
     
     /**
      * Creates a matrix of pixels
@@ -40,11 +41,25 @@ public class Image {
      */
     public Image(Integer width, Integer height){
         this.pixelMap = new Pixel[width][height];
-        this.width = width;
-        this.height = height;
         for (int j = 0; j < width; j++)
             for (int i = 0; i < height; i++)
                 this.pixelMap[j][i] = new Pixel();
+    }
+    
+    public Image(ConcurrentHashMap<Coord,AtomicLong> pop, Integer width, Integer height) {
+        this.pixelMap = new Pixel[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                Coord coord = new Coord();
+                coord.setLocation(i, j);
+                AtomicLong tmp = pop.get(coord);
+                if (tmp != null) {
+                    this.pixelMap[i][j] = new Pixel(Double.longBitsToDouble(tmp.get()));
+                }else{
+                    this.pixelMap[i][j] = new Pixel(0.0);
+                }
+            }
+        }
     }
     
     /**
@@ -54,12 +69,12 @@ public class Image {
      * @param img represents a buffer of image data
      */
     public Image(BufferedImage img) {
-        this.width = img.getWidth();
-        this.height = img.getHeight();
-        this.pixelMap = new Pixel[this.width][this.height];
+        Integer width = img.getWidth();
+        Integer height = img.getHeight();
+        this.pixelMap = new Pixel[width][height];
         
-        for (int j = 0; j < this.width; j++){
-            for (int i = 0; i < this.height; i++){
+        for (int j = 0; j < width; j++){
+            for (int i = 0; i < height; i++){
                 try{
                     this.pixelMap[j][i] = new Pixel(img.getRGB(j, i));
                 }catch(Exception ex){
@@ -88,8 +103,6 @@ public class Image {
           for (h=0;h<height;h++){
             this.pixelMap[w][h]= new Pixel(pop[w][h]);
           }}
-      this.width=width;
-      this.height=height;
     }
 
     /**
@@ -98,7 +111,7 @@ public class Image {
      * @return the width in a integer value 
      */
     public Integer getWidth() {
-        return width;
+        return this.pixelMap.length;
     }
 
     /**
@@ -107,7 +120,7 @@ public class Image {
      * @return the height in a integer value
      */
     public Integer getHeight() {
-        return height;
+        return this.pixelMap[0].length;
     }
     
     /**
@@ -119,11 +132,10 @@ public class Image {
     public BufferedImage toBufferedImage() {
         Integer w;
         Integer h;
-        BufferedImage image = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
        
-        for (w=0;w<width;w++){
-                //System.out.print(this.pixelMap[w][0].toARGB());
-            for (h=0;h<height;h++){
+        for (w=0;w<this.pixelMap.length;w++){
+            for (h=0;h<this.pixelMap[w].length;h++){
                 image.setRGB(w, h,this.pixelMap[w][h].toARGB());
             }
         }
@@ -151,8 +163,8 @@ public class Image {
     public void overlap(Image fg){
         Integer w;
         Integer h;
-        for (w=0;w<this.width;w++)
-            for (h=0;h<this.height;h++)
+        for (w=0;w<this.pixelMap.length;w++)
+            for (h=0;h<this.pixelMap[0].length;h++)
                 this.pixelMap[w][h].overlap(fg.getPixel(w, h));
     }
     
@@ -166,8 +178,8 @@ public class Image {
         Integer w;
         Integer h;
         Double racio = 0.5;
-        for (w=0;w<this.width;w++)
-            for (h=0;h<this.height;h++)
+        for (w=0;w<this.pixelMap.length;w++)
+            for (h=0;h<this.pixelMap[0].length;h++)
                 this.pixelMap[w][h].underlap(bg.getPixel(w, h),racio);   
     }
 

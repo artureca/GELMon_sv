@@ -26,9 +26,11 @@ import java.util.concurrent.*;
 import tools.FileSystem;
 import java.util.Random;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.PerspectiveTransform;
+import tools.Coord;
 
 /**
  * A class with static methods used to process the clients requests.
@@ -107,78 +109,29 @@ public class Logic {
 
         ArrayList<Point2D.Double> points = new Locations().getLocation(date1, date2);
 
-        Double[][] values = new Double[Heatmap.getBackground().getWidth()][Heatmap.getBackground().getHeight()];
+        ConcurrentHashMap<Coord, AtomicLong> map = new ConcurrentHashMap<>();
 
-        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
-            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
-                values[i][j] = 0.0;
-            }
-        }
-
-//        points.parallelStream().map((point) -> {
-//            Point2D old = new Point2D.Double(point.getX(),point.getY());
-//            toPoint.transform(point, point);
-//            if (point.getX() == 658 && point.getY() == 191) {
-//                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getX() < 0) {
-//                point.setLocation(0, point.getY());
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getY() < 0) {
-//                point.setLocation(point.getX(), 0);
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getX() > Heatmap.getBackground().getWidth() - 1) {
-//                point.setLocation(Heatmap.getBackground().getWidth() - 1, point.getY());
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getY() > Heatmap.getBackground().getHeight() - 1) {
-//                point.setLocation(point.getX(), Heatmap.getBackground().getHeight() - 1);
-//            }
-//            return point;
-//        }).forEachOrdered((point) -> {
-//            synchronized (values) {
-//                values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-//            }
-//        });
-        points.parallelStream().map((point) -> {
+        points.stream().map((point) -> {
             Point2D old = new Point2D.Double(point.getX(), point.getY());
             toPoint.transform(point, point);
-            if (point.getX() == 658 && point.getY() == 191) {
-                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
-            }
             return point;
-        }).forEachOrdered((point) -> {
-            if (point.getX() > 0
-                    && point.getY() > 0
-                    && point.getX() < Heatmap.getBackground().getWidth() - 1
-                    && point.getY() < Heatmap.getBackground().getHeight() - 1) {
-
-                synchronized (values) {
-                    values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-                }
-            }else{
-                System.out.println("Image Overflow");
-            }
+        }).forEach((point) -> {
+            Coord coord = new Coord();
+            coord.setLocation(point);
+            Long tmp = map.computeIfAbsent(coord, k -> new AtomicLong(0)).incrementAndGet();
         });
 
-        for (int i = 0; i < values.length; i++) {
-            for (int j = 0; j < values[i].length; j++) {
-                if (values[i][j] >= 100) {
-                    values[i][j] = 1.0;
-                    System.out.println("Image Unknown Error");
-                }
-            }
-        }
+        map.entrySet().stream().forEach(entry -> {
+            Long tmp = entry.getValue().updateAndGet(value -> value > 99 ? 0 : value);
+        });
+        map.values().parallelStream().map(value -> value.updateAndGet(val -> Double.doubleToLongBits((double) val * 1.0)));
 
-        Heatmap heatmap = new Heatmap(Smooth(values, Heatmap.getBackground().getWidth(), Heatmap.getBackground().getHeight()));
-//        Heatmap heatmap = new Heatmap(values);
+        ConcurrentHashMap<Coord, AtomicLong> newmap = map;
+//        newmap = Smooth(newmap);
+//        newmap = Normalize(newmap);
+        System.out.println("Creatings Pixels");
+        Heatmap heatmap = new Heatmap(map);
+        System.out.println("Overlaping Pixels");
         heatmap.generate();
         return heatmap;
     }
@@ -207,6 +160,8 @@ public class Logic {
         }
 
         Heatmap heatmap = generateHeatmap(date1, date2);
+        
+        System.out.println("Converting to BufferedImage");
         BufferedImage image = heatmap.toBufferedImage();
 
         //FileSystem.saveImage(filePath, image);
@@ -296,9 +251,9 @@ public class Logic {
         }
     }
 
-    private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
+    private static ConcurrentHashMap<Coord, AtomicLong> Smooth(ConcurrentHashMap<Coord, AtomicLong> map) {
         // 13x13
-        double[][] matriz = {
+        long[][] matriz = {
             {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0},
             {0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1, 0, 0},
@@ -317,36 +272,51 @@ public class Logic {
 
         Double max = 0.0;
 
-        Double[][] res = new Double[w][h];
-
+        ConcurrentHashMap<Coord, AtomicLong> newmap = new ConcurrentHashMap<>();
         System.out.println("Smothing heatmap");
 
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
-                res[i][j] = 0.0;
-//                res[i][j] = getMirroredValue(data, i , j , w, h);
-                for (int t = 0; t < 13; t++) {
-                    for (int l = 0; l < 13; l++) {
-                        res[i][j] += getMirroredValue(data, i + t - 6, j + l - 6, w, h) * matriz[t][l];
-                    }
-                }
-                //res[i][j] /= total;
-                if (max < res[i][j]) {
-                    max = res[i][j];
+        map.entrySet().parallelStream().forEach(entry -> {
+            for (int i = 0; i < matriz.length; i++) {
+                for (int j = 0; j < matriz[i].length; j++) {
+                    Coord coord = new Coord();
+                    coord.setLocation(entry.getKey().getX() + i - matriz.length / 2, entry.getKey().getY() + j - matriz.length / 2);
+                    newmap.computeIfAbsent(coord, e -> new AtomicLong(0)).addAndGet(matriz[i][j] * entry.getValue().get());
                 }
             }
-        }
+        });
+
+//        for (int i = 0; i < w; i++) {
+//            for (int j = 0; j < h; j++) {
+//                res[i][j] = 0.0;
+////                res[i][j] = getMirroredValue(data, i , j , w, h);
+//                for (int t = 0; t < 13; t++) {
+//                    for (int l = 0; l < 13; l++) {
+//                        res[i][j] += getMirroredValue(data, i + t - 6, j + l - 6, w, h) * matriz[t][l];
+//                    }
+//                }
+//                //res[i][j] /= total;
+//                if (max < res[i][j]) {
+//                    max = res[i][j];
+//                }
+//            }
+//        }
+        return newmap;
+    }
+
+    private static ConcurrentHashMap<Coord, AtomicLong> Normalize(ConcurrentHashMap<Coord, AtomicLong> map) {
+        // 13x13
         System.out.println("Normalizing heatmap");
-
-        if (max != 0) {
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
-                    res[i][j] /= max;
-                }
+        Double max = 0.0;
+        for (AtomicLong value : map.values()) {
+            if (Double.longBitsToDouble(value.get()) > max) {
+                max = Double.longBitsToDouble(value.get());
             }
         }
 
-        return res;
+        final Double trueMax = max;
+        map.values().stream().map(value -> value.updateAndGet(value1 -> Double.doubleToLongBits( value1 / trueMax)));
+
+        return map;
     }
 
     private static Double getMirroredValue(Double[][] data, Integer i, Integer j, Integer w, Integer h) {

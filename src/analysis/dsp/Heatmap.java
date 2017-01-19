@@ -5,6 +5,9 @@
  */
 package analysis.dsp;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import tools.Coord;
 import tools.FileSystem;
 
 /**
@@ -18,6 +21,11 @@ public class Heatmap extends Image{
         super(pop, background.getWidth(), background.getHeight());
         //super(pop, 1000, 1000);
     }
+
+    public Heatmap(ConcurrentHashMap<Coord, AtomicLong> pop) {
+        super(pop,  background.getWidth(), background.getHeight());
+    }
+    
     
     public void generate(){
         if (null == background)
