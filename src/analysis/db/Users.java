@@ -29,7 +29,7 @@ public class Users extends MySQL{
     public boolean vfLogin(String name, String email, int number){      
              
         try{
-            String query = "SELECT * FROM users WHERE email = ?";
+           /* String query = "SELECT * FROM users WHERE email = ?";
             st1 = con.prepareStatement(query);
             st1.setString(1,email);
             rs=st1.executeQuery();
@@ -46,8 +46,28 @@ public class Users extends MySQL{
                 st1.setString(2, name);
                 st1.setInt(3, number);
                 st1.executeUpdate();
+                return true;*/        
+           
+    
+            String query = "INSERT INTO users (email, name, number)\n" +
+                            "SELECT * FROM (SELECT ?, ?, ?) AS tmp\n" +
+                            "WHERE NOT EXISTS (\n" +
+                            "    SELECT email FROM users WHERE email = '?'\n" +
+                            ") LIMIT 1;";
+            st1 = con.prepareStatement(query);
+            st1.setString(1,email);
+            st1.setString(1,name);
+            st1.setInt(2, number);
+            st1.setString(3, email);
+            
+            rs=st1.executeQuery();
+            if(rs.next()){
+                System.out.println("Login OK");
                 return true;
+            } else {
+                return false;
             }
+                  
             
         } catch(SQLException ex) {
             System.out.println("vfLogin error:" + ex);

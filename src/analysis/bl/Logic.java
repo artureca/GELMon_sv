@@ -632,9 +632,9 @@ public class Logic {
      */
     public static String getsBuilding(double latitude, double longitude) {
 
-        if ((41.177965 < latitude) && (latitude < 41.179073) && (longitude > -8.594829) && (longitude < -8.594320)) {
+        if ((41.177965 < latitude) && (latitude < 41.178443) && (longitude > -8.594829) && (longitude < -8.594320)) {
             return "Mecanica";
-        } else if ((41.177968 < latitude) && (latitude < 41.178830) && (longitude > -8.595530) && (longitude < -8.594838)) {
+        } else if ((41.177968 < latitude) && (latitude < 41.178463) && (longitude > -8.595530) && (longitude < -8.594838)) {
             return "Eletro";
         } else if ((41.177285 < latitude) && (latitude < 41.177627) && (longitude > -8.594891) && (longitude < -8.594468)) {
             return "Biblioteca";
