@@ -115,58 +115,59 @@ public class Logic {
             }
         }
 
-//        points.parallelStream().map((point) -> {
-//            Point2D old = new Point2D.Double(point.getX(),point.getY());
-//            toPoint.transform(point, point);
-//            if (point.getX() == 658 && point.getY() == 191) {
-//                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getX() < 0) {
-//                point.setLocation(0, point.getY());
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getY() < 0) {
-//                point.setLocation(point.getX(), 0);
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getX() > Heatmap.getBackground().getWidth() - 1) {
-//                point.setLocation(Heatmap.getBackground().getWidth() - 1, point.getY());
-//            }
-//            return point;
-//        }).map((point) -> {
-//            if (point.getY() > Heatmap.getBackground().getHeight() - 1) {
-//                point.setLocation(point.getX(), Heatmap.getBackground().getHeight() - 1);
-//            }
-//            return point;
-//        }).forEachOrdered((point) -> {
-//            synchronized (values) {
-//                values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-//            }
-//        });
-        points.parallelStream().map((point) -> {
-            Point2D old = new Point2D.Double(point.getX(), point.getY());
+        points.stream().map((point) -> {
+            Point2D old = new Point2D.Double(point.getX(),point.getY());
             toPoint.transform(point, point);
             if (point.getX() == 658 && point.getY() == 191) {
                 System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
             }
             return point;
+        }).map((point) -> {
+            if (point.getX() < 0) {
+                point.setLocation(0, point.getY());
+            }
+            return point;
+        }).map((point) -> {
+            if (point.getY() < 0) {
+                point.setLocation(point.getX(), 0);
+            }
+            return point;
+        }).map((point) -> {
+            if (point.getX() > Heatmap.getBackground().getWidth() - 1) {
+                point.setLocation(Heatmap.getBackground().getWidth() - 1, point.getY());
+            }
+            return point;
+        }).map((point) -> {
+            if (point.getY() > Heatmap.getBackground().getHeight() - 1) {
+                point.setLocation(point.getX(), Heatmap.getBackground().getHeight() - 1);
+            }
+            return point;
         }).forEachOrdered((point) -> {
-            if (point.getX() > 0
-                    && point.getY() > 0
-                    && point.getX() < Heatmap.getBackground().getWidth() - 1
-                    && point.getY() < Heatmap.getBackground().getHeight() - 1) {
-
-                synchronized (values) {
-                    values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-                }
-            }else{
-                System.out.println("Image Overflow");
+            synchronized (values) {
+                values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
             }
         });
+        
+//        points.parallelStream().map((point) -> {
+//            Point2D old = new Point2D.Double(point.getX(), point.getY());
+//            toPoint.transform(point, point);
+//            if (point.getX() == 658 && point.getY() == 191) {
+//                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
+//            }
+//            return point;
+//        }).forEachOrdered((point) -> {
+//            if (point.getX() > 0
+//                    && point.getY() > 0
+//                    && point.getX() < Heatmap.getBackground().getWidth() - 1
+//                    && point.getY() < Heatmap.getBackground().getHeight() - 1) {
+//
+//                synchronized (values) {
+//                    values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
+//                }
+//            }else{
+//                System.out.println("Image Overflow");
+//            }
+//        });
 
         for (int i = 0; i < values.length; i++) {
             for (int j = 0; j < values[i].length; j++) {
@@ -609,6 +610,7 @@ public class Logic {
                 util.setSessionid(sid);
             }
         }
+        Boolean check =  new Users().vfLogin(name, email, Integer.valueOf(num));
         return sid;
     }
 

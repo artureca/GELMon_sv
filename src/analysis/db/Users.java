@@ -49,24 +49,15 @@ public class Users extends MySQL{
                 return true;*/        
            
     
-            String query = "INSERT INTO users (email, name, number)\n" +
-                            "SELECT * FROM (SELECT ?, ?, ?) AS tmp\n" +
-                            "WHERE NOT EXISTS (\n" +
-                            "    SELECT email FROM users WHERE email = '?'\n" +
-                            ") LIMIT 1;";
+            String query = "INSERT INTO users (email, name, number) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE name=?, number=?";
             st1 = con.prepareStatement(query);
             st1.setString(1,email);
-            st1.setString(1,name);
-            st1.setInt(2, number);
-            st1.setString(3, email);
+            st1.setString(2,name);
+            st1.setInt(3, number);
+            st1.setString(4,name);
+            st1.setInt(5, number);
             
-            rs=st1.executeQuery();
-            if(rs.next()){
-                System.out.println("Login OK");
-                return true;
-            } else {
-                return false;
-            }
+            st1.executeUpdate();
                   
             
         } catch(SQLException ex) {
