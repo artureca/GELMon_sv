@@ -5,13 +5,13 @@
  */
 package analysis.db;
 
+import java.awt.geom.Point2D;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 //import javax.mail.internet.AddressException;
 //import javax.mail.internet.InternetAddress;
-import tools.Pair;
 
 /**
  * Class that handles the storing and retrieving of data from the locations table.
@@ -96,9 +96,9 @@ public class Locations extends MySQL {
      * @param f_time Timestamp of the final time.
      * @return Returns an ArrayList of Pair<Double,Double> with positions recorded.
      */
-    public ArrayList<Pair<Double,Double>> getLocation(long i_time, long f_time){
+    public ArrayList<Point2D.Double> getLocation(long i_time, long f_time){
        
-        ArrayList<Pair<Double,Double>> arrayList = new ArrayList<>(); 
+        ArrayList<Point2D.Double> arrayList = new ArrayList<>(); 
         
         if(i_time > f_time) return arrayList;
         
@@ -110,7 +110,7 @@ public class Locations extends MySQL {
             rs = st1.executeQuery();
             
             while(rs.next())
-                arrayList.add(new Pair<>(rs.getDouble("latitude"),rs.getDouble("longitude")));
+                arrayList.add(new Point2D.Double(rs.getDouble("latitude"),rs.getDouble("longitude")));
             
         } catch(SQLException ex){
             System.out.println("getLocation error:" + ex);

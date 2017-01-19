@@ -18,16 +18,17 @@ package analysis.bl;
 
 import analysis.db.*;
 import analysis.dsp.Heatmap;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 import tools.FileSystem;
-import tools.Pair;
 import java.util.Random;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.media.jai.PerspectiveTransform;
 
 /**
  * A class with static methods used to process the clients requests.
@@ -42,7 +43,7 @@ public class Logic {
     private static String vidFolder;
     private static String url;
 
-    private static final Double[][] TMATRIX = new Double[2][2];
+    private static PerspectiveTransform toPoint;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
     private static final ConcurrentHashMap<String, User> LOGGEDIN = new ConcurrentHashMap<String, User>();
@@ -79,32 +80,32 @@ public class Logic {
     }
 
     public static String debugMatrix(Double k, Double v) {
-        Pair<Double, Double> tmp = new Pair<>(k, v);
-        Pair<Double, Double> point = new Pair<>(0.0, 0.0);
-        point.setK(TMATRIX[0][0] * tmp.getK() + TMATRIX[0][1] * tmp.getV());
-        point.setV(TMATRIX[1][0] * tmp.getK() + TMATRIX[1][1] * tmp.getV());
 
-        if (point.getK() < 0) {
-            point.setK(0.0);
+        Point2D.Double coord = new Point2D.Double(k, v);
+
+        toPoint.transform(coord, coord);
+
+        if (coord.getX() < 0) {
+            coord.setLocation(0, coord.getY());
         }
-        if (point.getV() < 0) {
-            point.setV(0.0);
+        if (coord.getY() < 0) {
+            coord.setLocation(coord.getX(), 0);
         }
-        if (point.getK() > Heatmap.getBackground().getWidth() - 1) {
-            point.setK(Heatmap.getBackground().getWidth() - 1.0);
+        if (coord.getX() > Heatmap.getBackground().getWidth() - 1) {
+            coord.setLocation(Heatmap.getBackground().getWidth() - 1, coord.getY());
         }
-        if (point.getV() > Heatmap.getBackground().getHeight() - 1) {
-            point.setV(Heatmap.getBackground().getHeight() - 1.0);
+        if (coord.getY() > Heatmap.getBackground().getHeight() - 1) {
+            coord.setLocation(coord.getX(), Heatmap.getBackground().getHeight() - 1);
         }
 
-        return point.toString();
+        return coord.toString();
     }
 
     private static Heatmap generateHeatmap(Long date1, Long date2) {
 
         System.out.println("Generating heatmap");
 
-        ArrayList<Pair<Double, Double>> points = new Locations().getLocation(date1, date2);
+        ArrayList<Point2D.Double> points = new Locations().getLocation(date1, date2);
 
         Double[][] values = new Double[Heatmap.getBackground().getWidth()][Heatmap.getBackground().getHeight()];
 
@@ -114,39 +115,70 @@ public class Logic {
             }
         }
 
+//        points.parallelStream().map((point) -> {
+//            Point2D old = new Point2D.Double(point.getX(),point.getY());
+//            toPoint.transform(point, point);
+//            if (point.getX() == 658 && point.getY() == 191) {
+//                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
+//            }
+//            return point;
+//        }).map((point) -> {
+//            if (point.getX() < 0) {
+//                point.setLocation(0, point.getY());
+//            }
+//            return point;
+//        }).map((point) -> {
+//            if (point.getY() < 0) {
+//                point.setLocation(point.getX(), 0);
+//            }
+//            return point;
+//        }).map((point) -> {
+//            if (point.getX() > Heatmap.getBackground().getWidth() - 1) {
+//                point.setLocation(Heatmap.getBackground().getWidth() - 1, point.getY());
+//            }
+//            return point;
+//        }).map((point) -> {
+//            if (point.getY() > Heatmap.getBackground().getHeight() - 1) {
+//                point.setLocation(point.getX(), Heatmap.getBackground().getHeight() - 1);
+//            }
+//            return point;
+//        }).forEachOrdered((point) -> {
+//            synchronized (values) {
+//                values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
+//            }
+//        });
         points.parallelStream().map((point) -> {
-            Pair<Double, Double> tmp = new Pair<>(point);
-            point.setK(TMATRIX[0][0] * tmp.getK() + TMATRIX[0][1] * tmp.getV());
-            point.setV(TMATRIX[1][0] * tmp.getK() + TMATRIX[1][1] * tmp.getV());
-            return point;
-        }).map((point) -> {
-            if (point.getK() < 0) {
-                point.setK(0.0);
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getV() < 0) {
-                point.setV(0.0);
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getK() > Heatmap.getBackground().getWidth() - 1) {
-                point.setK(Heatmap.getBackground().getWidth() - 1.0);
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getV() > Heatmap.getBackground().getHeight() - 1) {
-                point.setV(Heatmap.getBackground().getHeight() - 1.0);
+            Point2D old = new Point2D.Double(point.getX(), point.getY());
+            toPoint.transform(point, point);
+            if (point.getX() == 658 && point.getY() == 191) {
+                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
             }
             return point;
         }).forEachOrdered((point) -> {
-            synchronized (values) {
-                values[point.getK().intValue()][point.getV().intValue()] += 1.0;
+            if (point.getX() > 0
+                    && point.getY() > 0
+                    && point.getX() < Heatmap.getBackground().getWidth() - 1
+                    && point.getY() < Heatmap.getBackground().getHeight() - 1) {
+
+                synchronized (values) {
+                    values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
+                }
+            }else{
+                System.out.println("Image Overflow");
             }
         });
 
+        for (int i = 0; i < values.length; i++) {
+            for (int j = 0; j < values[i].length; j++) {
+                if (values[i][j] >= 100) {
+                    values[i][j] = 1.0;
+                    System.out.println("Image Unknown Error");
+                }
+            }
+        }
+
         Heatmap heatmap = new Heatmap(Smooth(values, Heatmap.getBackground().getWidth(), Heatmap.getBackground().getHeight()));
-        //Heatmap heatmap = new Heatmap(values);
+//        Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
     }
@@ -218,34 +250,33 @@ public class Logic {
         addRequest("Meet#" + user.getSessionid() + "#" + emailB + "#" + room + "#" + resp);
     }
 
-    
-    private static void hourlyHeatmap(Long d){
-            d -= TimeUnit.DAYS.toMillis(1);
-         
-            for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
-                long hour1 = TimeUnit.MILLISECONDS.toHours(t);
-                Long date1= TimeUnit.HOURS.toMillis(hour1);
-                Long date2= TimeUnit.HOURS.toMillis((hour1 + 1)%24);
-                String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
-                String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
-                Heatmap img = generateHeatmap(t, t + 3540);
-                BufferedImage image = img.toBufferedImage();
-                     synchronized (LOCK) {
-                     FileSystem.saveImage(filePath, image);
-                     PROCESSING.remove(fileName);
-                     LOCK.notifyAll();
-                    }
+    private static void hourlyHeatmap(Long d) {
+        d -= TimeUnit.DAYS.toMillis(1);
+
+        for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
+            long hour1 = TimeUnit.MILLISECONDS.toHours(t);
+            Long date1 = TimeUnit.HOURS.toMillis(hour1);
+            Long date2 = TimeUnit.HOURS.toMillis((hour1 + 1) % 24);
+            String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+            String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
+            Heatmap img = generateHeatmap(t, t + 3540);
+            BufferedImage image = img.toBufferedImage();
+            synchronized (LOCK) {
+                FileSystem.saveImage(filePath, image);
+                PROCESSING.remove(fileName);
+                LOCK.notifyAll();
             }
-             System.out.println("Finished HEATMAP Hourly");
+        }
+        System.out.println("Finished HEATMAP Hourly");
     }
-    
+
     private static void generateVideo(Long d) {
         int i = 0;
-        d = (d / 1000)-84600;
+        d = (d / 1000) - 84600;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
 
-        for (long t = d; t < d + /*84600*/ 5*600; t = t + 600) {
+        for (long t = d; t < d + /*84600*/ 5 * 600; t = t + 600) {
             Heatmap img = generateHeatmap(t, t + 1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
@@ -267,15 +298,19 @@ public class Logic {
 
     private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
         double[][] matriz = {
-            {0, 0, 0, 0, 1, 0, 0, 0, 0},
-            {0, 0, 1, 1, 2, 1, 1, 0, 0},
-            {0, 1, 1, 2, 3, 2, 1, 1, 0},
-            {0, 1, 2, 3, 4, 3, 2, 1, 0},
-            {1, 2, 3, 4, 5, 4, 3, 2, 1},
-            {0, 1, 2, 3, 4, 3, 2, 1, 0},
-            {0, 1, 1, 2, 3, 2, 1, 1, 0},
-            {0, 0, 1, 1, 2, 1, 1, 0, 0},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0}
+            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0},
+            {0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1, 0, 0},
+            {0, 0, 1, 2, 2, 3, 4, 3, 2, 2, 1, 0, 0},
+            {0, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 0},
+            {0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0},
+            {1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1},
+            {0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0},
+            {0, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 0},
+            {0, 0, 1, 2, 2, 3, 4, 3, 2, 2, 1, 0, 0},
+            {0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1, 0, 0},
+            {0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}
         };
         //double total = 73; //73;
 
@@ -288,9 +323,10 @@ public class Logic {
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 res[i][j] = 0.0;
-                for (int t = 0; t < 9; t++) {
-                    for (int l = 0; l < 9; l++) {
-                        res[i][j] += getMirroredValue(data, i + t - 4, j + l - 4, w, h) * matriz[t][l];
+//                res[i][j] = getMirroredValue(data, i , j , w, h);
+                for (int t = 0; t < 13; t++) {
+                    for (int l = 0; l < 13; l++) {
+                        res[i][j] += getMirroredValue(data, i + t - 6, j + l - 6, w, h) * matriz[t][l];
                     }
                 }
                 //res[i][j] /= total;
@@ -299,7 +335,7 @@ public class Logic {
                 }
             }
         }
-
+            Coord wow;
         System.out.println("Normalizing heatmap");
 
         if (max != 0) {
@@ -336,8 +372,8 @@ public class Logic {
         vidFolder = FileSystem.getConfig("LOGIC.videodir");
         url = FileSystem.getConfig("LOGIC.url");
 
-        Pair<Double, Double> from1, from2;
-        Pair<Double, Double> to1, to2;
+        Point2D.Double from1, from2, from3, from4;
+        Point2D.Double to1, to2, to3, to4;
 
         String point;
         String[] points, p1, p2;
@@ -348,8 +384,8 @@ public class Logic {
         points = point.split(">");
         p1 = points[0].split(",");
         p2 = points[1].split(",");
-        from1 = new Pair(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
-        to1 = new Pair(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
+        from1 = new Point2D.Double(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
+        to1 = new Point2D.Double(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
 
         point = FileSystem.getConfig("LOGIC.matrix.point2");
         point = point.replace('(', ' ');
@@ -357,19 +393,37 @@ public class Logic {
         points = point.split(">");
         p1 = points[0].split(",");
         p2 = points[1].split(",");
-        from2 = new Pair(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
-        to2 = new Pair(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
+        from2 = new Point2D.Double(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
+        to2 = new Point2D.Double(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
 
-        TMATRIX[1][1] = (from1.getK() * to2.getV() - to1.getV() * from2.getK()) / (from1.getK() * from2.getV() - from1.getV() * from2.getK());
-        TMATRIX[0][1] = (from1.getK() * to2.getK() - to1.getK() * from2.getK()) / (from1.getK() * from2.getV() - from1.getV() * from2.getK());
-        TMATRIX[1][0] = (to1.getV() - TMATRIX[1][1] * from1.getV()) / from1.getK();
-        TMATRIX[0][0] = (to1.getK() - TMATRIX[0][1] * from1.getV()) / from1.getK();
+        point = FileSystem.getConfig("LOGIC.matrix.point3");
+        point = point.replace('(', ' ');
+        point = point.replace(')', ' ');
+        points = point.split(">");
+        p1 = points[0].split(",");
+        p2 = points[1].split(",");
+        from3 = new Point2D.Double(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
+        to3 = new Point2D.Double(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
 
-        System.out.println();
-        System.out.println(from1.toString() + ">" + to1.toString());
-        System.out.println(from2.toString() + ">" + to2.toString());
-        System.out.println(TMATRIX[0][0] + "\t | \t" + TMATRIX[0][1]);
-        System.out.println(TMATRIX[1][0] + "\t | \t" + TMATRIX[1][1]);
+        point = FileSystem.getConfig("LOGIC.matrix.point4");
+        point = point.replace('(', ' ');
+        point = point.replace(')', ' ');
+        points = point.split(">");
+        p1 = points[0].split(",");
+        p2 = points[1].split(",");
+        from4 = new Point2D.Double(Double.valueOf(p1[0]), Double.valueOf(p1[1]));
+        to4 = new Point2D.Double(Double.valueOf(p2[0]), Double.valueOf(p2[1]));
+
+        toPoint = PerspectiveTransform.getQuadToQuad(
+                from1.getX(), from1.getY(),
+                from2.getX(), from2.getY(),
+                from3.getX(), from3.getY(),
+                from4.getX(), from4.getY(),
+                to1.getX(), to1.getY(),
+                to2.getX(), to2.getY(),
+                to3.getX(), to3.getY(),
+                to4.getX(), to4.getY()
+        );
 
         Heatmap.setup();
         MySQL.setup();
@@ -378,7 +432,7 @@ public class Logic {
         SCHEDULER.scheduleAtFixedRate(new Thread() {
             @Override
             public void run() {
-                runDaily();
+                //runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
         }, 5, TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
@@ -603,7 +657,7 @@ public class Logic {
         System.out.println("Current Time: " + System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
         hourlyHeatmap(System.currentTimeMillis());
-        
+
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {
