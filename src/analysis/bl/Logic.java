@@ -600,8 +600,7 @@ public class Logic {
     private static void generateLogs(Long d){
         d -= TimeUnit.DAYS.toMillis(1);
         Long dt=TimeUnit.MILLISECONDS.toDays(d);
-        String fileName = MD5.crypt(dt.toString());
-        String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName;
+        
         
         Locations loc = new Locations();
         
@@ -613,21 +612,33 @@ public class Logic {
             data.computeIfAbsent(building,k -> new ArrayList<>())
                     .add(location.getV());
         });
-        
-        data.forEach(building -> {
+/*
+       
+        data.forEach(k-> {
                 getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(1));
         });
         
-            ArrayList<String> ret = new ArrayList<>();
-           
-            synchronized (LOCK) {
+          String fileName = MD5.crypt(dt.toString());
+          String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName;
+          synchronized (LOCK) {
             FileSystem.saveText(filePath, ret);
             PROCESSING.remove(fileName);
             LOCK.notifyAll();
-        
         }
-        System.out.println("Finished Log Hourly");
+        
+        
+        data.forEach(k-> {
+                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.5));
+        });
+        
+        data.forEach(k-> {
+                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.25));
+        });
+           */
+        System.out.println("Finished Log Hourly/30min/15min");
     }
+    
+    
     
 
     public static String loginUser(String name, String email, String num) {
@@ -694,6 +705,7 @@ public class Logic {
         System.out.println("Current Time: " + System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
         hourlyHeatmap(System.currentTimeMillis());
+        //generateLogs(System.currentTimeMillis());
 
     }
 
