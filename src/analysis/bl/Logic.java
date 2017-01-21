@@ -28,6 +28,7 @@ import tools.FileSystem;
 import java.util.Random;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.jai.PerspectiveTransform;
@@ -280,7 +281,7 @@ public class Logic {
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
 
-        for (long t = d; t < d + /*84600*/ 5 * 600; t = t + 600) {
+        for (long t = d; t < d + /*84600*/ 40 * 600; t = t + 600) {
             Heatmap img = generateHeatmap(t, t + 1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
@@ -550,28 +551,48 @@ public class Logic {
     public static ArrayList<String> getNumberOfLocationsByInterval(ArrayList<Long> nmr, Long init, Long fin, Long step) {
 
         Long aux = ((fin - init) / step);
-        Integer[] num = new Integer[aux.intValue()];
-
-        for (int i = 0; i < aux.intValue(); i++) {
-            num[i] = 0;
-        }
+        System.out.println("INIT: " + init + " | FIN: " + fin + " | STEP: " + step + " | AUX: " + aux);
+        //Integer[] num = new Integer[aux.intValue()];
+        final ConcurrentHashMap<Integer,AtomicInteger> num = new ConcurrentHashMap<>();
+        
+//        for (int i = 0; i < aux.intValue(); i++) {
+//            num[i] = 0;
+//        }
 
         // nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
         ArrayList<String> ret = new ArrayList<>();
 
-        for (Long time : nmr) {
-            aux = (time - init) / step;
-            System.out.println("aux.intValue() = " + aux.intValue());
-            num[aux.intValue()]++;
-            System.out.println("num[" + aux.intValue() + "] = " + num[aux.intValue()]);
-        }
+        nmr.stream().forEach(loc -> {
+            Long tmp = (loc - init) / step;
+            int n = num.computeIfAbsent(tmp.intValue(), k -> new AtomicInteger(0)).incrementAndGet();
+            //System.out.print(" " + tmp.intValue() + "|" + n + "|" + loc);
+//            num[tmp.intValue()] = num[tmp.intValue()] + 1;
+        });
+        System.out.println();
+        
+//        for (Long time : nmr) {
+//            aux = (time - init) / step;
+//            System.out.println("aux.intValue = " + aux.intValue());
+//            num[aux.intValue()]++;
+//            System.out.println("num[" + aux.intValue() + "] = " + num[aux.intValue()]);
+//        }
 
         System.out.println("Fim do primeiro ciclo for");
 
-        for (Integer i : num) {
-            ret.add(i.toString());
+        for (int i = 0; i < aux; i++) {
+            AtomicInteger tmp = num.get(i);
+            if (tmp == null) {
+                ret.add("0");
+            }else{
+                ret.add(Integer.toString(tmp.get()));
+            }
+            
         }
         
+        num.entrySet().stream().forEachOrdered(entry -> {
+            //System.out.print(" " + entry.getKey() + "|" + entry.getValue().get());
+            ret.add(Integer.toString(entry.getValue().get()));
+        });
         return ret;
     }
     
@@ -580,10 +601,15 @@ public class Logic {
         final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
         //Long dt=TimeUnit.MILLISECONDS.toDays(d);
         
-        final ArrayList <Pair<Point2D.Double,Long>> tudo = new Locations().getFullLocation(d, d+TimeUnit.DAYS.toMillis(1));
+        final ArrayList <Pair<Point2D.Double,Long>> tudo = new Locations().getFullLocation(day, day+TimeUnit.DAYS.toSeconds(1));
         final ConcurrentHashMap <String,ArrayList<Long>> data = new ConcurrentHashMap<>();
         final ConcurrentHashMap <String,ArrayList<String>> newdata = new ConcurrentHashMap<>();
         final ArrayList<String> finaldata = new ArrayList<>();
+//        
+//        System.out.println("Tudo: ");
+//        tudo.stream().forEachOrdered(text ->{
+//            System.out.println("\t" + text);
+//        });
         
         tudo.parallelStream().forEach(location -> {
             String building = getsBuilding(location.getK().getX(),location.getK().getY());
@@ -591,8 +617,18 @@ public class Logic {
                     .add(location.getV());
         });
         
+        System.out.println("Data: ");
+        newdata.entrySet().stream().forEachOrdered(text ->{
+            System.out.println("\t" + text.getKey() + " -> " + text.getValue());
+        });
+        
         data.entrySet().stream().forEach(entry -> {
             newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(),day,day+TimeUnit.DAYS.toSeconds(1),step));
+        });
+        
+        System.out.println("NewData: ");
+        newdata.entrySet().stream().forEachOrdered(text ->{
+            System.out.println("\t" + text.getKey() + " -> " + text.getValue());
         });
         
         newdata.entrySet().stream().forEach(entry -> {
@@ -612,9 +648,28 @@ public class Logic {
         data.forEach(k-> {
                 getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(1));
         });
+          SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+          sdf.format(new Date(day));
+          switch(step) {
+                case 1 :
+                step=60;
+                break;
+   
+                case 1/2 :
+                step=30;
+                break;
+                
+                case 1/4 :
+                step=15;
+                break;
+
         
-          String fileName = MD5.crypt(dt.toString());
-          String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName;
+                default : 
+                break;
+            }
+        
+          String fileName = "localizacoes" + step;
+          String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + sdf + "/" + fileName;
           synchronized (LOCK) {
             FileSystem.saveText(filePath, ret);
             PROCESSING.remove(fileName);
@@ -699,11 +754,15 @@ public class Logic {
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
       
-        hourlyHeatmap(System.currentTimeMillis());
-        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
-        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
-        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
+        generateLog(1483315200000L,TimeUnit.HOURS.toSeconds(1));
+        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(30));
+        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(15));
         
+       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
+       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
+       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
+        
+        hourlyHeatmap(System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
 
     }
