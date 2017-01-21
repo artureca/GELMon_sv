@@ -698,11 +698,13 @@ public class Logic {
 
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
-        generateVideo(System.currentTimeMillis());
+      
         hourlyHeatmap(System.currentTimeMillis());
         generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
         generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
         generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
+        
+        generateVideo(System.currentTimeMillis());
 
     }
 
