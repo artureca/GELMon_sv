@@ -72,7 +72,7 @@ public class Proto_PHP extends Protocol {
         });*/
        
         
-        return Logic.getNumberOfLocationsByInterval(Long.decode(tokens[1]), Long.decode(tokens[2]), Long.decode(tokens[3]));
+        return " ";
     }
     
     private String handlerDebugMatrix(String[] tokens) {

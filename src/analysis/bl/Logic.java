@@ -49,7 +49,7 @@ public class Logic {
     private static PerspectiveTransform toPoint;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final ConcurrentSkipListSet<String> PROCESSING = new ConcurrentSkipListSet<>();
-    private static final ConcurrentHashMap<String, User> LOGGEDIN = new ConcurrentHashMap<String, User>();
+    private static final ConcurrentHashMap<String, User> LOGGEDIN = new ConcurrentHashMap<>();
     private static final Object LOCK = new Object();
     public static final ConcurrentLinkedQueue<String> REQUESTS = new ConcurrentLinkedQueue<>();
 
@@ -299,7 +299,6 @@ public class Logic {
             Logger.getLogger(Logic.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
    
     private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
         // 13x13 matrix
@@ -542,22 +541,13 @@ public class Logic {
      * Gets number of locations in DB between a given interval, with a precision
      * defined by the step
      *
+     * @param nmr
      * @param init initial date of the interval
      * @param fin final date of the interval
      * @param step precision of the interval
      * @return
      */
-    public static String getNumberOfLocationsByInterval(Long init, Long fin, Long step) {
-
-        String fileName = MD5.crypt(init.toString() + fin.toString() + step.toString()) + ".dat";
-        String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + fileName;
-        String fileURL = url + "/" + graphFolder + "/" + fileName;
-
-        // should work, not sure. Comment if problems arise! ///////////////////
-        if (checkFile(fileName, filePath)) {
-            return fileURL;
-        }
-        ////////////////////////////////////////////////////////////////////////
+    public static ArrayList<String> getNumberOfLocationsByInterval(ArrayList<Long> nmr, Long init, Long fin, Long step) {
 
         Long aux = ((fin - init) / step);
         Integer[] num = new Integer[aux.intValue()];
@@ -566,7 +556,7 @@ public class Logic {
             num[i] = 0;
         }
 
-        ArrayList<Long> nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
+        // nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
         ArrayList<String> ret = new ArrayList<>();
 
         for (Long time : nmr) {
@@ -581,37 +571,40 @@ public class Logic {
         for (Integer i : num) {
             ret.add(i.toString());
         }
-
-        //FileSystem.saveText(filePath, ret);
-        // should work, not sure. Comment if problems arise! ///////////////////
-        synchronized (LOCK) {
-            FileSystem.saveText(filePath, ret);
-            PROCESSING.remove(fileName);
-            LOCK.notifyAll();
-        }
-        ////////////////////////////////////////////////////////////////////////
-//        (41.177628,-8.597396)>(182.0,351.0)
-//        (41.178021,-8.864874)>(844.0,205.0)
-//        1459.2030922137008       |      -1454.7693321062093
-//        1446.1753940042763       |      -1425.6652207026052
-
-        return fileURL;
+        
+        return ret;
     }
     
     private static void generateLogs(Long d){
-        d -= TimeUnit.DAYS.toMillis(1);
-        Long dt=TimeUnit.MILLISECONDS.toDays(d);
+        final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
+        //Long dt=TimeUnit.MILLISECONDS.toDays(d);
         
-        
-        Locations loc = new Locations();
-        
-        ArrayList <Pair<Point2D.Double,Long>> tudo= loc.getFullLocation(d, d+TimeUnit.DAYS.toMillis(1));
-        ConcurrentHashMap <String,ArrayList<Long>> data = new ConcurrentHashMap<>();
+        final ArrayList <Pair<Point2D.Double,Long>> tudo = new Locations().getFullLocation(d, d+TimeUnit.DAYS.toMillis(1));
+        final ConcurrentHashMap <String,ArrayList<Long>> data = new ConcurrentHashMap<>();
+        final ConcurrentHashMap <String,ArrayList<String>> newdata = new ConcurrentHashMap<>();
+        final ArrayList<String> finaldata = new ArrayList<>();
         
         tudo.parallelStream().forEach(location -> {
             String building = getsBuilding(location.getK().getX(),location.getK().getY());
             data.computeIfAbsent(building,k -> new ArrayList<>())
                     .add(location.getV());
+        });
+        
+        data.entrySet().stream().forEach(entry -> {
+            newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(),day,day+TimeUnit.DAYS.toSeconds(1),TimeUnit.HOURS.toSeconds(1)));
+        });
+        
+        newdata.entrySet().stream().forEach(entry -> {
+            finaldata.add(entry.getKey());
+            String tmp = "";
+            tmp = entry.getValue().stream().map((value) -> value + " ").reduce(tmp, String::concat);
+            finaldata.add(tmp);
+        });
+        
+        
+        System.out.println("Writing Log Hourly/30min/15min: ");
+        finaldata.stream().forEachOrdered(text ->{
+            System.out.println("\t" + text);
         });
 /*
        
@@ -636,7 +629,6 @@ public class Logic {
                 getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.25));
         });
            */
-        System.out.println("Finished Log Hourly/30min/15min");
     }
     
     
