@@ -261,7 +261,7 @@ public class Logic {
             long hour1 = TimeUnit.MILLISECONDS.toHours(t);
             Long date1 = TimeUnit.HOURS.toMillis(hour1);
             Long date2 = TimeUnit.HOURS.toMillis((hour1 + 1) % 24);
-            String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+            String fileName = MD5.crypt(date1.toString()).concat(date2.toString()).concat(".png");
             String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
             Heatmap img = generateHeatmap(t, t + 3540);
             BufferedImage image = img.toBufferedImage();
