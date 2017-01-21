@@ -575,7 +575,8 @@ public class Logic {
         return ret;
     }
     
-    private static void generateLogs(Long d){
+    private static void generateLog(Long d, Long step){
+        d=d/1000;
         final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
         //Long dt=TimeUnit.MILLISECONDS.toDays(d);
         
@@ -591,7 +592,7 @@ public class Logic {
         });
         
         data.entrySet().stream().forEach(entry -> {
-            newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(),day,day+TimeUnit.DAYS.toSeconds(1),TimeUnit.HOURS.toSeconds(1)));
+            newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(),day,day+TimeUnit.DAYS.toSeconds(1),step));
         });
         
         newdata.entrySet().stream().forEach(entry -> {
@@ -699,7 +700,9 @@ public class Logic {
         System.out.println("Current Time: " + System.currentTimeMillis());
         generateVideo(System.currentTimeMillis());
         hourlyHeatmap(System.currentTimeMillis());
-        //generateLogs(System.currentTimeMillis());
+        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
+        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
+        generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
 
     }
 
