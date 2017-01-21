@@ -436,7 +436,7 @@ public class Logic {
         SCHEDULER.scheduleAtFixedRate(new Thread() {
             @Override
             public void run() {
-                //runDaily();
+                runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
         }, 5, TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
