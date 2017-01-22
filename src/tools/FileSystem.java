@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,32 +27,58 @@ import javax.imageio.ImageIO;
  * @author Artur Antunes
  */
 public class FileSystem {
-    private static final HashMap<String,String> CONFIG = new HashMap<>();
-    
-    public static Boolean fileExists(String path){
+
+    private static final HashMap<String, String> CONFIG = new HashMap<>();
+
+    public static Boolean delete(String path) {
+        File f = new File(path);
+        if (!f.exists()) {
+            return true;
+        }
+        
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Deleting file/folder: " + path);
+        
+        String[] entries = f.list();
+        if (entries != null) {
+            for (String file : entries) {
+                if (!delete(path + "/" + file)) {
+                    return false;
+                }
+            }
+        }
+        try {
+            return f.delete();
+        } catch (SecurityException ex) {
+            return false;
+        }
+    }
+
+    public static Boolean fileExists(String path) {
         File f = new File(path);
         return f.exists() && !f.isDirectory();
     }
-    
-    public static void loadDefaultConfig(){
+
+    public static void loadDefaultConfig() {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading default configuration");
         BufferedReader txtReader = new BufferedReader(new InputStreamReader(FileSystem.class.getResourceAsStream("default.conf")));
         try {
-            while(true){
+            while (true) {
                 String line = txtReader.readLine();
-                if (null == line)
+                if (null == line) {
                     break;
+                }
                 String[] tokens = line.split("=");
-                if(tokens[0].charAt(0) == '#')
+                if (tokens[0].charAt(0) == '#') {
                     continue;
+                }
                 CONFIG.put(tokens[0], tokens[1]);
             }
         } catch (IOException ex) {
             //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public static BufferedImage loadImage(String path){
+
+    public static BufferedImage loadImage(String path) {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading file: " + path);
         BufferedImage img;
         try {
@@ -62,10 +89,10 @@ public class FileSystem {
         }
         return img;
     }
-    
-    public static Boolean saveImage(String path, BufferedImage img){
+
+    public static Boolean saveImage(String path, BufferedImage img) {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Saving file: " + path);
-                    
+
         Boolean flag;
         try {
             File imgFile = new File(path);
@@ -79,20 +106,21 @@ public class FileSystem {
         }
         return flag;
     }
-    
-    public static ArrayList<String> loadText(String path){
+
+    public static ArrayList<String> loadText(String path) {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading file: " + path);
         ArrayList<String> text = new ArrayList<>();
         try {
-            for (Iterator<String> it = Files.readAllLines(Paths.get(path)).iterator(); it.hasNext();)
+            for (Iterator<String> it = Files.readAllLines(Paths.get(path)).iterator(); it.hasNext();) {
                 text.add(it.next());
+            }
         } catch (IOException ex) {
             //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
         }
         return text;
     }
-    
-    public static Boolean saveText(String path, ArrayList<String> data){
+
+    public static Boolean saveText(String path, ArrayList<String> data) {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Saving file: " + path);
         Boolean flag;
         try {
@@ -102,37 +130,54 @@ public class FileSystem {
             //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
             flag = false;
         }
-        return flag;        
+        return flag;
     }
     
-    public static void loadConfig(String path){
+    public static Boolean appendText(String path, ArrayList<String> data) {
+        System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Appending file: " + path);
+        Boolean flag;
+        try {
+            Files.write(Paths.get(path), data, StandardCharsets.UTF_8,StandardOpenOption.APPEND);
+            flag = true;
+        } catch (IOException ex) {
+            //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            flag = false;
+        }
+        return flag;
+    }
+
+    public static void loadConfig(String path) {
         CONFIG.clear();
         loadDefaultConfig();
-        
+
         ArrayList<String> text = loadText(path);
-        if (text.isEmpty())
+        if (text.isEmpty()) {
             return;
-        
+        }
+
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading configuration file");
-        
+
         text.forEach((line) -> {
             String[] tokens = line.split("=");
-            if(tokens[0].charAt(0) != '#')
+            if (tokens[0].charAt(0) != '#') {
                 CONFIG.put(tokens[0], tokens[1]);
+            }
         });
     }
-    
-    public static String getConfig(String key){
-        if (CONFIG.isEmpty())
+
+    public static String getConfig(String key) {
+        if (CONFIG.isEmpty()) {
             loadDefaultConfig();
-        
-        if (!CONFIG.containsKey(key)) 
+        }
+
+        if (!CONFIG.containsKey(key)) {
             System.err.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Loading null config from key: " + key);
-            
+        }
+
         return CONFIG.get(key);
     }
-    
-    public static void displayCurrentConfig(){
-        CONFIG.forEach((k,v) -> System.out.println(k + " | " + v));
+
+    public static void displayCurrentConfig() {
+        CONFIG.forEach((k, v) -> System.out.println(k + " | " + v));
     }
 }
