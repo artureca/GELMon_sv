@@ -256,12 +256,13 @@ public class Logic {
     }
 
     private static void hourlyHeatmap(Long d) {
-        d -= TimeUnit.DAYS.toMillis(1);
+        d=d/1000;
+        d = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
 
-        for (long t = d; t < d + TimeUnit.HOURS.toMillis(24); t = t + TimeUnit.HOURS.toMillis(1)) {
-            long hour1 = TimeUnit.MILLISECONDS.toHours(t);
-            Long date1 = TimeUnit.HOURS.toMillis(hour1);
-            Long date2 = TimeUnit.HOURS.toMillis((hour1 + 1) % 24);
+        for (long t = d; t < d + TimeUnit.HOURS.toSeconds(24); t = t + TimeUnit.HOURS.toSeconds(1)) {
+            long hour1 = TimeUnit.SECONDS.toHours(t);
+             Long date1 = TimeUnit.HOURS.toSeconds(hour1);
+            Long date2 = TimeUnit.HOURS.toSeconds((hour1 + 1) % 24);
             String fileName = MD5.crypt(date1.toString()).concat(date2.toString()).concat(".png");
             String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
             Heatmap img = generateHeatmap(t, t + 3540);
@@ -277,11 +278,11 @@ public class Logic {
 
     private static void generateVideo(Long d) {
         int i = 0;
-        d = (d / 1000) - 84600;
+        d = (d / 1000) - 86400;
         String fileName = MD5.crypt(d.toString());
         String filePath = System.getenv("HOME") + "/public_html/" + vidFolder + "/" + fileName;
 
-        for (long t = d; t < d + /*84600*/ 40 * 600; t = t + 600) {
+        for (long t = d; t < d + 86400 /*40 * 600*/; t = t + 600) {
             Heatmap img = generateHeatmap(t, t + 1740);
             BufferedImage image = img.toBufferedImage();
             FileSystem.saveImage(filePath + "/" + String.valueOf(i) + ".png", image);
@@ -650,23 +651,6 @@ public class Logic {
         });
           SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
           sdf.format(new Date(day));
-          switch(step) {
-                case 1 :
-                step=60;
-                break;
-   
-                case 1/2 :
-                step=30;
-                break;
-                
-                case 1/4 :
-                step=15;
-                break;
-
-        
-                default : 
-                break;
-            }
         
           String fileName = "localizacoes" + step;
           String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + sdf + "/" + fileName;
@@ -754,17 +738,16 @@ public class Logic {
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
       
-        generateLog(1483315200000L,TimeUnit.HOURS.toSeconds(1));
-        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(30));
-        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(15));
+        generateVideo(System.currentTimeMillis());
+        hourlyHeatmap(System.currentTimeMillis());
+//        generateLog(1483315200000L,TimeUnit.HOURS.toSeconds(1));
+//        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(30));
+//        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(15));
         
        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
         
-        hourlyHeatmap(System.currentTimeMillis());
-        generateVideo(System.currentTimeMillis());
-
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {
