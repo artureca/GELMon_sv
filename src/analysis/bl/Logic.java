@@ -27,7 +27,6 @@ import java.util.concurrent.*;
 import tools.FileSystem;
 import java.util.Random;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,7 +119,7 @@ public class Logic {
         }
 
         points.stream().map((point) -> {
-            Point2D old = new Point2D.Double(point.getX(),point.getY());
+            Point2D old = new Point2D.Double(point.getX(), point.getY());
             toPoint.transform(point, point);
             if (point.getX() == 658 && point.getY() == 191) {
                 System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
@@ -151,7 +150,7 @@ public class Logic {
                 values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
             }
         });
-        
+
 //        points.parallelStream().map((point) -> {
 //            Point2D old = new Point2D.Double(point.getX(), point.getY());
 //            toPoint.transform(point, point);
@@ -172,7 +171,6 @@ public class Logic {
 //                System.out.println("Image Overflow");
 //            }
 //        });
-
         for (int i = 0; i < values.length; i++) {
             for (int j = 0; j < values[i].length; j++) {
                 if (values[i][j] >= 100) {
@@ -256,12 +254,12 @@ public class Logic {
     }
 
     private static void hourlyHeatmap(Long d) {
-        d=d/1000;
-        d = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
+        d = d / 1000;
+        d = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d) - 1);
 
         for (long t = d; t < d + TimeUnit.HOURS.toSeconds(24); t = t + TimeUnit.HOURS.toSeconds(1)) {
             long hour1 = TimeUnit.SECONDS.toHours(t);
-             Long date1 = TimeUnit.HOURS.toSeconds(hour1);
+            Long date1 = TimeUnit.HOURS.toSeconds(hour1);
             Long date2 = TimeUnit.HOURS.toSeconds((hour1 + 1) % 24);
             String fileName = MD5.crypt(date1.toString()).concat(date2.toString()).concat(".png");
             String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
@@ -301,23 +299,23 @@ public class Logic {
             Logger.getLogger(Logic.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-   
+
     private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
         // 13x13 matrix
-        double[][] matriz = {
-            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0},
-            {0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1, 0, 0},
-            {0, 0, 1, 2, 2, 3, 4, 3, 2, 2, 1, 0, 0},
-            {0, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 0},
-            {0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0},
-            {1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1},
-            {0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 0},
-            {0, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 0},
-            {0, 0, 1, 2, 2, 3, 4, 3, 2, 2, 1, 0, 0},
-            {0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1, 0, 0},
-            {0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}
+        long[][] matriz = {
+            {1, 2, 3, 4, 6, 7, 7, 7, 6, 4, 3, 2, 1},
+            {2, 3, 6, 8, 11, 13, 13, 13, 11, 8, 6, 3, 2},
+            {3, 6, 9, 13, 18, 21, 22, 21, 18, 13, 9, 6, 3},
+            {4, 8, 13, 20, 26, 30, 32, 30, 26, 20, 13, 8, 4},
+            {6, 11, 18, 26, 34, 40, 42, 40, 34, 26, 18, 11, 6},
+            {7, 13, 21, 30, 40, 47, 50, 47, 40, 30, 21, 13, 7},
+            {7, 13, 22, 32, 42, 50, 53, 50, 42, 32, 22, 13, 7},
+            {7, 13, 21, 30, 40, 47, 50, 47, 40, 30, 21, 13, 7},
+            {6, 11, 18, 26, 34, 40, 42, 40, 34, 26, 18, 11, 6},
+            {4, 8, 13, 20, 26, 30, 32, 30, 26, 20, 13, 8, 4},
+            {3, 6, 9, 13, 18, 21, 22, 21, 18, 13, 9, 6, 3},
+            {2, 3, 6, 8, 11, 13, 13, 13, 11, 8, 6, 3, 2},
+            {1, 2, 3, 4, 6, 7, 7, 7, 6, 4, 3, 2, 1}
         };
         //double total = 73; //73;
 
@@ -325,9 +323,12 @@ public class Logic {
 
         Double[][] res = new Double[w][h];
 
-        System.out.println("Smothing heatmap");
+        System.out.print("Smothing heatmap: ");
 
         for (int i = 0; i < w; i++) {
+            if ((i * 1000 / w) % 10 == 0) {
+                System.out.print("|");
+            }
             for (int j = 0; j < h; j++) {
                 res[i][j] = 0.0;
 //                res[i][j] = getMirroredValue(data, i , j , w, h);
@@ -342,6 +343,7 @@ public class Logic {
                 }
             }
         }
+        System.out.println();
         System.out.println("Normalizing heatmap");
 
         if (max != 0) {
@@ -438,7 +440,7 @@ public class Logic {
         SCHEDULER.scheduleAtFixedRate(new Thread() {
             @Override
             public void run() {
-                runDaily();
+                //runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
         }, 5, TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
@@ -554,12 +556,11 @@ public class Logic {
         Long aux = ((fin - init) / step);
         System.out.println("INIT: " + init + " | FIN: " + fin + " | STEP: " + step + " | AUX: " + aux);
         //Integer[] num = new Integer[aux.intValue()];
-        final ConcurrentHashMap<Integer,AtomicInteger> num = new ConcurrentHashMap<>();
-        
+        final ConcurrentHashMap<Integer, AtomicInteger> num = new ConcurrentHashMap<>();
+
 //        for (int i = 0; i < aux.intValue(); i++) {
 //            num[i] = 0;
 //        }
-
         // nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
         ArrayList<String> ret = new ArrayList<>();
 
@@ -570,81 +571,79 @@ public class Logic {
 //            num[tmp.intValue()] = num[tmp.intValue()] + 1;
         });
         System.out.println();
-        
+
 //        for (Long time : nmr) {
 //            aux = (time - init) / step;
 //            System.out.println("aux.intValue = " + aux.intValue());
 //            num[aux.intValue()]++;
 //            System.out.println("num[" + aux.intValue() + "] = " + num[aux.intValue()]);
 //        }
-
         System.out.println("Fim do primeiro ciclo for");
 
         for (int i = 0; i < aux; i++) {
             AtomicInteger tmp = num.get(i);
             if (tmp == null) {
                 ret.add("0");
-            }else{
+            } else {
                 ret.add(Integer.toString(tmp.get()));
             }
-            
+
         }
-        
+
         num.entrySet().stream().forEachOrdered(entry -> {
             //System.out.print(" " + entry.getKey() + "|" + entry.getValue().get());
             ret.add(Integer.toString(entry.getValue().get()));
         });
         return ret;
     }
-    
-    private static void generateLog(Long d, Long step){
-        d=d/1000;
-        final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d)-1);
+
+    private static void generateLog(Long d, Long step) {
+        d = d / 1000;
+        final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d) - 1);
         //Long dt=TimeUnit.MILLISECONDS.toDays(d);
-        
-        final ArrayList <Pair<Point2D.Double,Long>> tudo = new Locations().getFullLocation(day, day+TimeUnit.DAYS.toSeconds(1));
-        final ConcurrentHashMap <String,ArrayList<Long>> data = new ConcurrentHashMap<>();
-        final ConcurrentHashMap <String,ArrayList<String>> newdata = new ConcurrentHashMap<>();
+
+        final ArrayList<Pair<Point2D.Double, Long>> tudo = new Locations().getFullLocation(day, day + TimeUnit.DAYS.toSeconds(1));
+        final ConcurrentHashMap<String, ArrayList<Long>> data = new ConcurrentHashMap<>();
+        final ConcurrentHashMap<String, ArrayList<String>> newdata = new ConcurrentHashMap<>();
         final ArrayList<String> finaldata = new ArrayList<>();
 //        
 //        System.out.println("Tudo: ");
 //        tudo.stream().forEachOrdered(text ->{
 //            System.out.println("\t" + text);
 //        });
-        
+
         tudo.parallelStream().forEach(location -> {
-            String building = getsBuilding(location.getK().getX(),location.getK().getY());
-            data.computeIfAbsent(building,k -> new ArrayList<>())
+            String building = getsBuilding(location.getK().getX(), location.getK().getY());
+            data.computeIfAbsent(building, k -> new ArrayList<>())
                     .add(location.getV());
         });
-        
+
         System.out.println("Data: ");
-        newdata.entrySet().stream().forEachOrdered(text ->{
+        newdata.entrySet().stream().forEachOrdered(text -> {
             System.out.println("\t" + text.getKey() + " -> " + text.getValue());
         });
-        
+
         data.entrySet().stream().forEach(entry -> {
-            newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(),day,day+TimeUnit.DAYS.toSeconds(1),step));
+            newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(), day, day + TimeUnit.DAYS.toSeconds(1), step));
         });
-        
+
         System.out.println("NewData: ");
-        newdata.entrySet().stream().forEachOrdered(text ->{
+        newdata.entrySet().stream().forEachOrdered(text -> {
             System.out.println("\t" + text.getKey() + " -> " + text.getValue());
         });
-        
+
         newdata.entrySet().stream().forEach(entry -> {
             finaldata.add(entry.getKey());
             String tmp = "";
             tmp = entry.getValue().stream().map((value) -> value + " ").reduce(tmp, String::concat);
             finaldata.add(tmp);
         });
-        
-        
+
         System.out.println("Writing Log Hourly/30min/15min: ");
-        finaldata.stream().forEachOrdered(text ->{
+        finaldata.stream().forEachOrdered(text -> {
             System.out.println("\t" + text);
         });
-/*
+        /*
        
         data.forEach(k-> {
                 getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(1));
@@ -668,11 +667,8 @@ public class Logic {
         data.forEach(k-> {
                 getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.25));
         });
-           */
+         */
     }
-    
-    
-    
 
     public static String loginUser(String name, String email, String num) {
         Random sessionid = new Random();
@@ -690,7 +686,7 @@ public class Logic {
                 util.setSessionid(sid);
             }
         }
-        Boolean check =  new Users().vfLogin(name, email, Integer.valueOf(num));
+        Boolean check = new Users().vfLogin(name, email, Integer.valueOf(num));
         return sid;
     }
 
@@ -737,17 +733,16 @@ public class Logic {
 
     public static void runDaily() {
         System.out.println("Current Time: " + System.currentTimeMillis());
-      
+
         generateVideo(System.currentTimeMillis());
         hourlyHeatmap(System.currentTimeMillis());
 //        generateLog(1483315200000L,TimeUnit.HOURS.toSeconds(1));
 //        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(30));
 //        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(15));
-        
-       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
-       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
-       // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
-        
+
+        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
+        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
+        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {
