@@ -111,6 +111,7 @@ public class Logic {
         ArrayList<Point2D.Double> points = new Locations().getLocation(date1, date2);
 
         Double[][] values = new Double[Heatmap.getBackground().getWidth()][Heatmap.getBackground().getHeight()];
+        Double max = 0.0;
 
         for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
             for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
@@ -118,50 +119,31 @@ public class Logic {
             }
         }
 
-        points.stream().map((point) -> {
-            Point2D old = new Point2D.Double(point.getX(), point.getY());
-            toPoint.transform(point, point);
-            if (point.getX() == 658 && point.getY() == 191) {
-                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getX() < 0) {
-                point.setLocation(0, point.getY());
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getY() < 0) {
-                point.setLocation(point.getX(), 0);
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getX() > Heatmap.getBackground().getWidth() - 1) {
-                point.setLocation(Heatmap.getBackground().getWidth() - 1, point.getY());
-            }
-            return point;
-        }).map((point) -> {
-            if (point.getY() > Heatmap.getBackground().getHeight() - 1) {
-                point.setLocation(point.getX(), Heatmap.getBackground().getHeight() - 1);
-            }
-            return point;
-        }).forEachOrdered((point) -> {
-            synchronized (values) {
-                values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-            }
+        points.stream().forEach(coord -> {
+            Point2D point = new Point2D.Double();
+            toPoint.transform(coord, point);
+            Integer x = (int) Math.round(point.getX());
+            Integer y = (int) Math.round(point.getY());
+            Smooth(values, Heatmap.getBackground().getWidth(), Heatmap.getBackground().getHeight(), x, y);
         });
 
-        for (int i = 0; i < values.length; i++) {
-            for (int j = 0; j < values[i].length; j++) {
-                if (values[i][j] >= 100) {
-                    values[i][j] = 1.0;
-                    System.out.println("Image Unknown Error");
+        for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
+            for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
+                if (max < values[i][j]) {
+                    max = values[i][j];
                 }
             }
         }
 
-        Heatmap heatmap = new Heatmap(Smooth(values, Heatmap.getBackground().getWidth(), Heatmap.getBackground().getHeight()));
-//        Heatmap heatmap = new Heatmap(values);
+        if (max != 0) {
+            for (int i = 0; i < Heatmap.getBackground().getWidth(); i++) {
+                for (int j = 0; j < Heatmap.getBackground().getHeight(); j++) {
+                    values[i][j] /= max;
+                }
+            }
+        }
+        
+        Heatmap heatmap = new Heatmap(values);
         heatmap.generate();
         return heatmap;
     }
@@ -246,18 +228,18 @@ public class Logic {
             long hour1 = TimeUnit.SECONDS.toHours(t);
             Long date1 = TimeUnit.HOURS.toSeconds(hour1);
             Long date2 = TimeUnit.HOURS.toSeconds((hour1 + 1) % 24);
-            
+
             String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
             String folderPath = System.getenv("HOME") + "/public_html/" + imgFolder + "/";
             String filePath = folderPath + fileName + ".png";
-            
+
             Heatmap img = generateHeatmap(t, t + 3540);
             BufferedImage image = img.toBufferedImage();
-            
+
             String addLogString = fileName + " " + date1.toString() + " " + date2.toString();
             ArrayList<String> addLog = new ArrayList<>();
             addLog.add(addLogString);
-            
+
             synchronized (LOCK) {
                 FileSystem.appendText(folderPath + "heatmaps.log", addLog);
                 FileSystem.saveImage(filePath, image);
@@ -294,7 +276,7 @@ public class Logic {
         }
     }
 
-    private static Double[][] Smooth(Double[][] data, Integer w, Integer h) {
+    private static void Smooth(Double[][] res, Integer w, Integer h, Integer x, Integer y) {
         // 13x13 matrix
         long[][] matriz = {
             {1, 2, 3, 4, 6, 7, 7, 7, 6, 4, 3, 2, 1},
@@ -313,42 +295,26 @@ public class Logic {
         };
         //double total = 73; //73;
 
-        Double max = 0.0;
-
-        Double[][] res = new Double[w][h];
-
-        System.out.print("Smothing heatmap: ");
-
-        for (int i = 0; i < w; i++) {
-            if ((i * 1000 / w) % 10 == 0) {
-                System.out.print("|");
-            }
-            for (int j = 0; j < h; j++) {
-                res[i][j] = 0.0;
-//                res[i][j] = getMirroredValue(data, i , j , w, h);
-                for (int t = 0; t < 13; t++) {
-                    for (int l = 0; l < 13; l++) {
-                        res[i][j] += getMirroredValue(data, i + t - 6, j + l - 6, w, h) * matriz[t][l];
-                    }
+        for (int t = 0; t < 13; t++) {
+            for (int l = 0; l < 13; l++) {
+                Integer newx = x + t - 6;
+                Integer newy = y + l - 6;
+                if (newx < 0) {
+                    newx = 0;
                 }
-                //res[i][j] /= total;
-                if (max < res[i][j]) {
-                    max = res[i][j];
+                if (newx > w - 1) {
+                    newx = w - 1;
                 }
-            }
-        }
-        System.out.println();
-        System.out.println("Normalizing heatmap");
-
-        if (max != 0) {
-            for (int i = 0; i < w; i++) {
-                for (int j = 0; j < h; j++) {
-                    res[i][j] /= max;
+                if (newy < 0) {
+                    newy = 0;
                 }
+                if (newy > h - 1) {
+                    newy = h - 1;
+                }
+                res[newx][newy] += matriz[t][l];
             }
         }
 
-        return res;
     }
 
     private static Double getMirroredValue(Double[][] data, Integer i, Integer j, Integer w, Integer h) {
@@ -580,7 +546,7 @@ public class Logic {
 
     public static void runDaily() {
 //        long currentDay = TimeUnit.DAYS.toSeconds(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis()));
-        long currentDay = TimeUnit.DAYS.toSeconds(TimeUnit.MILLISECONDS.toDays(1483405650000L));
+        long currentDay = TimeUnit.DAYS.toSeconds(TimeUnit.MILLISECONDS.toDays(1483492050000L));
 
         System.out.println("Current Day: " + currentDay);
 
@@ -588,8 +554,8 @@ public class Logic {
         generateLog(currentDay, TimeUnit.MINUTES.toSeconds(30));
         generateLog(currentDay, TimeUnit.MINUTES.toSeconds(60));
 
-//        generateVideo(currentDay);
-//        hourlyHeatmap(currentDay);
+        generateVideo(currentDay);
+        hourlyHeatmap(currentDay);
         System.out.println("Done: " + currentDay);
     }
 
