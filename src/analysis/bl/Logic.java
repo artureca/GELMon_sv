@@ -151,26 +151,6 @@ public class Logic {
             }
         });
 
-//        points.parallelStream().map((point) -> {
-//            Point2D old = new Point2D.Double(point.getX(), point.getY());
-//            toPoint.transform(point, point);
-//            if (point.getX() == 658 && point.getY() == 191) {
-//                System.out.println("( " + old.getX() + " , " + old.getY() + " ) -> ( " + point.getX() + " , " + point.getY() + " )");
-//            }
-//            return point;
-//        }).forEachOrdered((point) -> {
-//            if (point.getX() > 0
-//                    && point.getY() > 0
-//                    && point.getX() < Heatmap.getBackground().getWidth() - 1
-//                    && point.getY() < Heatmap.getBackground().getHeight() - 1) {
-//
-//                synchronized (values) {
-//                    values[(int) Math.round(point.getX())][(int) Math.round(point.getY())] += 1.0;
-//                }
-//            }else{
-//                System.out.println("Image Overflow");
-//            }
-//        });
         for (int i = 0; i < values.length; i++) {
             for (int j = 0; j < values[i].length; j++) {
                 if (values[i][j] >= 100) {
@@ -197,7 +177,8 @@ public class Logic {
     public static String getHeatmap(Long date1, Long date2) {
 
         String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
-        String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName + ".png";
+        String folderPath = System.getenv("HOME") + "/public_html/" + imgFolder + "/";
+        String filePath = folderPath + fileName + ".png";
         String fileURL = url + "/" + imgFolder + "/" + fileName + ".png";
 
         if (checkFile(fileName, filePath)) {
@@ -214,7 +195,11 @@ public class Logic {
 
         //FileSystem.saveImage(filePath, image);
         // should work, not sure. Comment if problems arise! ///////////////////
+        String addLogString = fileName + " " + date1.toString() + " " + date2.toString();
+        ArrayList<String> addLog = new ArrayList<>();
+        addLog.add(addLogString);
         synchronized (LOCK) {
+            FileSystem.appendText(folderPath + "heatmaps.log", addLog);
             FileSystem.saveImage(filePath, image);
             PROCESSING.remove(fileName);
             LOCK.notifyAll();
@@ -261,11 +246,20 @@ public class Logic {
             long hour1 = TimeUnit.SECONDS.toHours(t);
             Long date1 = TimeUnit.HOURS.toSeconds(hour1);
             Long date2 = TimeUnit.HOURS.toSeconds((hour1 + 1) % 24);
-            String fileName = MD5.crypt(date1.toString()).concat(date2.toString()).concat(".png");
-            String filePath = System.getenv("HOME") + "/public_html/" + imgFolder + "/" + fileName;
+            
+            String fileName = MD5.crypt(date1.toString().concat(date2.toString()));
+            String folderPath = System.getenv("HOME") + "/public_html/" + imgFolder + "/";
+            String filePath = folderPath + fileName + ".png";
+            
             Heatmap img = generateHeatmap(t, t + 3540);
             BufferedImage image = img.toBufferedImage();
+            
+            String addLogString = fileName + " " + date1.toString() + " " + date2.toString();
+            ArrayList<String> addLog = new ArrayList<>();
+            addLog.add(addLogString);
+            
             synchronized (LOCK) {
+                FileSystem.appendText(folderPath + "heatmaps.log", addLog);
                 FileSystem.saveImage(filePath, image);
                 PROCESSING.remove(fileName);
                 LOCK.notifyAll();
@@ -440,105 +434,10 @@ public class Logic {
         SCHEDULER.scheduleAtFixedRate(new Thread() {
             @Override
             public void run() {
-                //runDaily();
+                runDaily();
             }
 //        }, 24 - TimeUnit.HOURS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS) + 2, 24, TimeUnit.HOURS);
-        }, 5, TimeUnit.HOURS.toHours(24), TimeUnit.SECONDS);
-    }
-
-    public static int[] getNumberOfLocationsByHour() {
-
-        int i, auxi;
-        Long aux;
-        int[] num = new int[24]; //Array com pessoas/hora
-        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
-
-        String inicio = "2016-03-01 00:00:00"; //Data inicio para pesquisa(quary) na DB
-        iniciots = Timestamp.valueOf(inicio);
-        Long inicionum = iniciots.getTime() / 1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(inicionum);
-
-        Long finnum = (inicionum + 86399) * 1000;  //Data final calculado (00:00:00+23:59:59) para pesquisa(quary) na DB
-        fimts = new Timestamp(finnum);
-
-        //String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
-        //fimts = Timestamp.valueOf(fin);
-        //Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(finnum);
-        ArrayList<String> all = new ArrayList<>(); //Inicializacao lista de timestamps(strings)
-        ArrayList<Long> nmr = new ArrayList<>();    //Inicializacao lista de timestamps(long)
-        /*  
-       // --------------------------------------------------------------------------------------------
-        all.add("2016-03-01 13:15:15");
-        all.add("2016-03-01 13:00:00");
-        all.add("2016-03-01 00:00:00");
-        all.add("2016-03-01 16:00:00");         //Substituir por funcao da base de dados
-        all.add("2016-03-01 20:10:15");         //Pode-se aproveitar a lista all na mesma
-        all.add("2016-03-01 22:45:00");
-        all.add("2016-03-01 08:30:00");
-        all.add("2016-03-01 10:15:15");
-        all.add("2016-03-01 23:59:59");
-      // ---------------------------------------------------------------------------------------------
-         */
-
-        Locations loc = new Locations();
-        //all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
-
-        for (i = 0; i < all.size(); i++) {           //Converte lista de strings para long
-            System.out.println(all.get(i));
-            la = Timestamp.valueOf(all.get(i));
-            nmr.add(la.getTime() / 1000);         //Elimina 0s a mais
-        }
-
-        for (i = 0; i < nmr.size(); i++) {           //Contagem das pessoas/hora
-            //System.out.println(nmr.get(i));
-            aux = nmr.get(i) - inicionum;
-            aux = aux / 3600;
-            auxi = aux.intValue();
-            num[auxi]++;
-        }
-        return num;
-    }
-
-    public static int[] getNumberOfLocationsByDay() { //Dias da semana
-
-        int i, auxi;
-        Long aux;
-        int[] num = new int[7]; //Array com pessoas/hora
-        Timestamp la, iniciots, fimts; //Variavel para converter string para timestamp
-
-        String inicio = "2016-03-01 00:00:00"; //Data inicio para pesquisa(quary) na DB
-        iniciots = Timestamp.valueOf(inicio);
-        Long inicionum = iniciots.getTime() / 1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(inicionum);
-
-        Long finnum = (inicionum + 604799) * 1000;  //Data final calculado (7 dias) para pesquisa(quary) na DB
-        fimts = new Timestamp(finnum);
-
-        //String fin = "2016-03-01 23:59:59"; //Data final para pesquisa(quary) na DB
-        //fimts = Timestamp.valueOf(fin);
-        //Long finnum = fimts.getTime()/1000; //Converte timestamp para inteiro e elimina 0s extra
-        //System.out.println(finnum);
-        ArrayList<String> all = new ArrayList<>(); //Inicializacao lista de timestamps(strings)
-        ArrayList<Long> nmr = new ArrayList<>();    //Inicializacao lista de timestamps(long)
-
-        Locations loc = new Locations();
-        //all = loc.getTimeLocation(iniciots, fimts);    //Busca a DB
-
-        for (i = 0; i < all.size(); i++) {           //Converte lista de strings para long
-            System.out.println(all.get(i));
-            la = Timestamp.valueOf(all.get(i));
-            nmr.add(la.getTime() / 1000);         //Elimina 0s a mais
-        }
-
-        for (i = 0; i < nmr.size(); i++) {           //Contagem das pessoas/hora
-            //System.out.println(nmr.get(i));
-            aux = nmr.get(i) - inicionum;
-            aux = aux / 86400;
-            auxi = aux.intValue();
-            num[auxi]++;
-        }
-        return num;
+        }, 5, TimeUnit.HOURS.toSeconds(24), TimeUnit.SECONDS);
     }
 
     /**
@@ -554,120 +453,68 @@ public class Logic {
     public static ArrayList<String> getNumberOfLocationsByInterval(ArrayList<Long> nmr, Long init, Long fin, Long step) {
 
         Long aux = ((fin - init) / step);
-        System.out.println("INIT: " + init + " | FIN: " + fin + " | STEP: " + step + " | AUX: " + aux);
-        //Integer[] num = new Integer[aux.intValue()];
-        final ConcurrentHashMap<Integer, AtomicInteger> num = new ConcurrentHashMap<>();
 
-//        for (int i = 0; i < aux.intValue(); i++) {
-//            num[i] = 0;
-//        }
-        // nmr = new Locations().getTimeLocation(init, fin);    //Busca a DB // BUSCA??? BUSCA??? PROCURA, puta de brasileirada do caralho!!!
+        final ConcurrentHashMap<Integer, AtomicInteger> num = new ConcurrentHashMap<>();
         ArrayList<String> ret = new ArrayList<>();
 
-        nmr.stream().forEach(loc -> {
-            Long tmp = (loc - init) / step;
-            int n = num.computeIfAbsent(tmp.intValue(), k -> new AtomicInteger(0)).incrementAndGet();
-            //System.out.print(" " + tmp.intValue() + "|" + n + "|" + loc);
-//            num[tmp.intValue()] = num[tmp.intValue()] + 1;
-        });
-        System.out.println();
-
-//        for (Long time : nmr) {
-//            aux = (time - init) / step;
-//            System.out.println("aux.intValue = " + aux.intValue());
-//            num[aux.intValue()]++;
-//            System.out.println("num[" + aux.intValue() + "] = " + num[aux.intValue()]);
-//        }
-        System.out.println("Fim do primeiro ciclo for");
-
         for (int i = 0; i < aux; i++) {
-            AtomicInteger tmp = num.get(i);
-            if (tmp == null) {
-                ret.add("0");
-            } else {
-                ret.add(Integer.toString(tmp.get()));
-            }
-
+            num.put(i, new AtomicInteger(0));
+//            System.out.print("|");
         }
+//        System.out.println();
+
+        nmr.forEach(loc -> {
+            Long tmp = (loc - init) / step;
+            num.get(tmp.intValue()).incrementAndGet();
+//            System.out.print(".");
+        });
+//        System.out.println();
 
         num.entrySet().stream().forEachOrdered(entry -> {
-            //System.out.print(" " + entry.getKey() + "|" + entry.getValue().get());
+//            System.out.print(entry.getKey() + "|" + entry.getValue() + " ");
             ret.add(Integer.toString(entry.getValue().get()));
         });
+//        System.out.println();
         return ret;
     }
 
     private static void generateLog(Long d, Long step) {
-        d = d / 1000;
-        final Long day = TimeUnit.DAYS.toSeconds(TimeUnit.SECONDS.toDays(d) - 1);
-        //Long dt=TimeUnit.MILLISECONDS.toDays(d);
+        final Long day = d - TimeUnit.DAYS.toSeconds(1);
 
         final ArrayList<Pair<Point2D.Double, Long>> tudo = new Locations().getFullLocation(day, day + TimeUnit.DAYS.toSeconds(1));
         final ConcurrentHashMap<String, ArrayList<Long>> data = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, ArrayList<String>> newdata = new ConcurrentHashMap<>();
         final ArrayList<String> finaldata = new ArrayList<>();
-//        
-//        System.out.println("Tudo: ");
-//        tudo.stream().forEachOrdered(text ->{
-//            System.out.println("\t" + text);
-//        });
 
-        tudo.parallelStream().forEach(location -> {
+//        System.out.println("Entry count: " + tudo.size());
+        tudo.forEach(location -> {
             String building = getsBuilding(location.getK().getX(), location.getK().getY());
             data.computeIfAbsent(building, k -> new ArrayList<>())
                     .add(location.getV());
         });
 
-        System.out.println("Data: ");
-        newdata.entrySet().stream().forEachOrdered(text -> {
-            System.out.println("\t" + text.getKey() + " -> " + text.getValue());
-        });
-
-        data.entrySet().stream().forEach(entry -> {
+//        System.out.println("Data size: " + data.size());
+        data.entrySet().forEach(entry -> {
+//            System.out.println(entry.getKey() + ": ");
             newdata.put(entry.getKey(), getNumberOfLocationsByInterval(entry.getValue(), day, day + TimeUnit.DAYS.toSeconds(1), step));
         });
 
-        System.out.println("NewData: ");
-        newdata.entrySet().stream().forEachOrdered(text -> {
-            System.out.println("\t" + text.getKey() + " -> " + text.getValue());
-        });
-
-        newdata.entrySet().stream().forEach(entry -> {
+//        System.out.println("NewData size: " + newdata.size());
+        newdata.entrySet().forEach(entry -> {
             finaldata.add(entry.getKey());
             String tmp = "";
-            tmp = entry.getValue().stream().map((value) -> value + " ").reduce(tmp, String::concat);
+            tmp = entry.getValue().stream().map((value) -> value + ",").reduce(tmp, String::concat).replaceAll(",$", "");
             finaldata.add(tmp);
         });
 
-        System.out.println("Writing Log Hourly/30min/15min: ");
-        finaldata.stream().forEachOrdered(text -> {
-            System.out.println("\t" + text);
-        });
-        /*
-       
-        data.forEach(k-> {
-                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(1));
-        });
-          SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-          sdf.format(new Date(day));
-        
-          String fileName = "localizacoes" + step;
-          String filePath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + sdf + "/" + fileName;
-          synchronized (LOCK) {
-            FileSystem.saveText(filePath, ret);
-            PROCESSING.remove(fileName);
-            LOCK.notifyAll();
-        }
-        
-        
-        data.forEach(k-> {
-                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.5));
-        });
-        
-        data.forEach(k-> {
-                getNumberOfLocationsByInterval(d,d+TimeUnit.DAYS.toMillis(1),TimeUnit.HOURS.toMillis(0.25));
-        });
-         */
+//        System.out.println("FinalData size: " + finaldata.size());
+//        System.out.println("Finished " + TimeUnit.SECONDS.toMinutes(step) + ".log:");
+//        finaldata.stream().forEachOrdered(text -> {
+//            System.out.println("\t" + text);
+//        });
+        String graphPath = System.getenv("HOME") + "/public_html/" + graphFolder + "/" + day + "/";
+
+        FileSystem.saveText(graphPath + TimeUnit.SECONDS.toMinutes(step) + ".log", finaldata);
     }
 
     public static String loginUser(String name, String email, String num) {
@@ -712,17 +559,17 @@ public class Logic {
     private static String getsBuilding(double latitude, double longitude) {
 
         if ((41.177965 < latitude) && (latitude < 41.178443) && (longitude > -8.594829) && (longitude < -8.594320)) {
-            return "Mecanica";
+            return "mecanica";
         } else if ((41.177968 < latitude) && (latitude < 41.178463) && (longitude > -8.595530) && (longitude < -8.594838)) {
-            return "Eletro";
+            return "eletro";
         } else if ((41.177285 < latitude) && (latitude < 41.177627) && (longitude > -8.594891) && (longitude < -8.594468)) {
-            return "Biblioteca";
+            return "biblioteca";
         } else if ((41.177162 < latitude) && (latitude < 41.177965) && (longitude > -8.597400) && (longitude < -8.595041)) {
-            return "BlocoB";
+            return "bloco";
         } else if ((41.177847 < latitude) && (latitude < 41.178405) && (longitude > -8.598041) && (longitude < -8.597439)) {
-            return "Info";
+            return "info";
         } else {
-            return "Other";
+            return "other";
         }
 
     }
@@ -732,17 +579,18 @@ public class Logic {
     }
 
     public static void runDaily() {
-        System.out.println("Current Time: " + System.currentTimeMillis());
+//        long currentDay = TimeUnit.DAYS.toSeconds(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis()));
+        long currentDay = TimeUnit.DAYS.toSeconds(TimeUnit.MILLISECONDS.toDays(1483405650000L));
 
-        generateVideo(System.currentTimeMillis());
-        hourlyHeatmap(System.currentTimeMillis());
-//        generateLog(1483315200000L,TimeUnit.HOURS.toSeconds(1));
-//        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(30));
-//        generateLog(1483315200000L,TimeUnit.MINUTES.toSeconds(15));
+        System.out.println("Current Day: " + currentDay);
 
-        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1));
-        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/2));
-        // generateLog(System.currentTimeMillis(),TimeUnit.HOURS.toSeconds(1/4));
+        generateLog(currentDay, TimeUnit.MINUTES.toSeconds(15));
+        generateLog(currentDay, TimeUnit.MINUTES.toSeconds(30));
+        generateLog(currentDay, TimeUnit.MINUTES.toSeconds(60));
+
+//        generateVideo(currentDay);
+//        hourlyHeatmap(currentDay);
+        System.out.println("Done: " + currentDay);
     }
 
     public static String getFriendsInf(ArrayList<String> lAmigos) {

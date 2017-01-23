@@ -35,9 +35,9 @@ public class FileSystem {
         if (!f.exists()) {
             return true;
         }
-        
+
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Deleting file/folder: " + path);
-        
+
         String[] entries = f.list();
         if (entries != null) {
             for (String file : entries) {
@@ -124,6 +124,8 @@ public class FileSystem {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Saving file: " + path);
         Boolean flag;
         try {
+            File txtFile = new File(path);
+            txtFile.getParentFile().mkdirs();
             Files.write(Paths.get(path), data, StandardCharsets.UTF_8);
             flag = true;
         } catch (IOException ex) {
@@ -132,12 +134,14 @@ public class FileSystem {
         }
         return flag;
     }
-    
+
     public static Boolean appendText(String path, ArrayList<String> data) {
         System.out.println("@ " + new Timestamp(System.currentTimeMillis()).toString() + " | Appending file: " + path);
         Boolean flag;
         try {
-            Files.write(Paths.get(path), data, StandardCharsets.UTF_8,StandardOpenOption.APPEND);
+            File txtFile = new File(path);
+            txtFile.getParentFile().mkdirs();
+            Files.write(Paths.get(path), data, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
             flag = true;
         } catch (IOException ex) {
             //Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
