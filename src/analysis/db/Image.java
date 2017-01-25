@@ -5,24 +5,35 @@
  */
 package analysis.db;
 
-
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 
 /**
+ * Class that handles the storing and retrieving of data from the images
+ * table.
  *
- * @author Bruno
+ *
+ * @author Bruno, Fábio Cunha
  */
 public class Image extends MySQL {
     
-    
-    
+    /**
+     * Image class constructor.
+     */
     public Image() {
+        Image.setup();
     }
     
     PreparedStatement st1;
     
+    /**
+     * Inserts a row into the images table.
+     *
+     * @param path Path of the image.
+     * @param i_time Timestamp of the initial time.
+     * @param f_time Timestamp of the final time.
+     * @return Returns True if successful.
+     */
     public boolean setImage(String path, Timestamp i_time, Timestamp f_time) {
         
         try{
@@ -39,7 +50,5 @@ public class Image extends MySQL {
         
      return true;   
     }
-    
-    
     
 }

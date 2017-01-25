@@ -24,7 +24,8 @@ import tools.FileSystem;
 
 /**
  * Parent Class for the child classes that handle storing and retrieving of information to and from the database.
- * @author ???
+ * 
+ * @author Bruno, Fábio Cunha
  */
 public class MySQL {
      
