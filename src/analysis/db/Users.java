@@ -42,9 +42,10 @@ public class Users extends MySQL{
             
         } catch(SQLException ex) {
             System.out.println("vfLogin error:" + ex);
+            return false;
         }
         
-     return true;   
+        return true;   
     }
 
     /**
@@ -95,4 +96,5 @@ public class Users extends MySQL{
         }
         return sInfo;
     }
+    
 }
