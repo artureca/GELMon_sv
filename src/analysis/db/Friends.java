@@ -17,6 +17,9 @@ import java.util.ArrayList;
  */
 public class Friends extends MySQL {
     
+    PreparedStatement st1;
+    ResultSet rs;
+    
     /**
      * Locations class constructor.
      */
@@ -34,10 +37,7 @@ public class Friends extends MySQL {
         ArrayList<String> sInfo;
         sInfo = new ArrayList<>();
         int i, j;
-        
-        PreparedStatement st1;
-        ResultSet rs;
-        
+
         try {
             String query = "SELECT email2 FROM friends WHERE email1 = ? ";
             st1 = con.prepareStatement(query);
@@ -70,8 +70,6 @@ public class Friends extends MySQL {
     * @return Returns the true if successful.
     */
     public Boolean addFriend(String userEmail1, String userEmail2) {
-        
-        PreparedStatement st1;
         
         try{
     

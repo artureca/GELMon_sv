@@ -20,6 +20,13 @@ public class Users extends MySQL{
     ResultSet rs;
     
     /**
+     * Locations class constructor.
+     */
+    public Users() {
+        Friends.setup();
+    }
+    
+    /**
     * Method that logs in a user and creates one if it doesn't exist in the database, or updates its name and number otherwise.
     * @param name User's name.
     * @param email User's email.
