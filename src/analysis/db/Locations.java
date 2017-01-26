@@ -97,13 +97,11 @@ public class Locations extends MySQL {
     }
 
     /**
-     * Retrieves the coordinates of the recorded positions between two moments
-     * in time..
+     * Retrieves the coordinates of the recorded positions between two moment in time.
      *
      * @param i_time Timestamp of the initial time.
      * @param f_time Timestamp of the final time.
-     * @return Returns an ArrayList of Pair<Double,Double> with positions
-     * recorded.
+     * @return Returns an ArrayList{@literal <}Point2D.Double{@literal >} with the recorded positions.
      */
     public ArrayList<Point2D.Double> getLocation(long i_time, long f_time) {
 
@@ -137,7 +135,7 @@ public class Locations extends MySQL {
      *
      * @param i_time Timestamp of the initial time.
      * @param f_time Timestamp of the final time.
-     * @return Returns an ArrayList of timestamps of positions recorded.
+     * @return Returns an ArrayList{@literal <}Long{@literal >} of timestamps of positions recorded.
      */
     public ArrayList<Long> getTimeLocation(long i_time, long f_time) {
 
@@ -165,6 +163,13 @@ public class Locations extends MySQL {
         return arrayList;
     }
 
+    /**
+     * Retrieves the coordinates and timestamps of the recorded positions between two moments in time.
+     *
+     * @param i_time Timestamp of the initial time.
+     * @param f_time Timestamp of the final time.
+     * @return Returns an ArrayList of Pair{@literal <}Point2D.Double, Long{@literal >} with the recorded positions and timestamps.
+     */
     public ArrayList<Pair<Point2D.Double, Long>> getFullLocation(long i_time, long f_time) {
 
         ArrayList<Pair<Point2D.Double, Long>> arrayList = new ArrayList<>();
