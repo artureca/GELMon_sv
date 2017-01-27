@@ -45,6 +45,7 @@ public class Locations extends MySQL {
      */
     public boolean setLocation(double latitude, double longitude, long l_time, String email, String tmsi) {
 
+        if(!isEmailValid(email)) return false;
         System.out.println("Inserting location: " + latitude + " ," + longitude + " @" + l_time);
 
         try {

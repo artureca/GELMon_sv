@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * Class that handles the storing and retrieving of data from the friends table.
@@ -71,8 +73,9 @@ public class Friends extends MySQL {
     */
     public Boolean addFriend(String userEmail1, String userEmail2) {
         
-        try{
-    
+        if(!(isEmailValid(userEmail1) || isEmailValid(userEmail2))) return false;
+        
+        try {
             String query = "INSERT INTO friends (email1, email2) VALUES(?, ?) ON DUPLICATE KEY UPDATE email1=?, email2=?";
             st1 = con.prepareStatement(query);
             st1.setString(1,userEmail1);
@@ -85,6 +88,22 @@ public class Friends extends MySQL {
             return false;
         }
         
+        return true;
+    }
+    
+    /**
+    *  Check if email string is valid.
+    * @param email String to evaluate.
+    * @return Returns true if valid and false otherwise.
+    */
+    private static boolean isEmailValid(String email) {
+        
+        try {
+           InternetAddress emailAddr = new InternetAddress(email);
+           emailAddr.validate();
+        } catch (AddressException ex) {
+           return false;
+        }
         return true;
     }
     

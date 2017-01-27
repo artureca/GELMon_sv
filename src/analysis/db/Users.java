@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * Class that handles the storing and retrieving of data from the users table.
@@ -34,9 +36,10 @@ public class Users extends MySQL{
     * @return Return true if successful and false otherwise.
     */
     public boolean vfLogin(String name, String email, int number){      
-             
-        try{
-    
+        
+        if(!isEmailValid(email)) return false;
+        
+        try {
             String query = "INSERT INTO users (email, name, number) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE name=?, number=?";
             st1 = con.prepareStatement(query);
             st1.setString(1,email);
@@ -104,4 +107,19 @@ public class Users extends MySQL{
         return sInfo;
     }
     
+    /**
+    *  Check if email string is valid.
+    * @param email String to evaluate.
+    * @return Returns true if valid and false otherwise.
+    */
+    private static boolean isEmailValid(String email) {
+        
+        try {
+           InternetAddress emailAddr = new InternetAddress(email);
+           emailAddr.validate();
+        } catch (AddressException ex) {
+           return false;
+        }
+        return true;
+    }
 }
